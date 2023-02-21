@@ -2,3 +2,88 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.badge {
+    @apply rounded-sm font-metropolis;
+}
+
+.btn {
+    @apply drop-shadow-neo rounded-sm border-4 border-black font-metropolis-bold;
+}
+
+.btn-hamburger {
+    @apply bg-base-100 text-black drop-shadow-none border-none;
+}
+
+.btn-hamburger:hover {
+    @apply bg-base-200 drop-shadow-none;
+}
+
+.btn-hamburger:focused {
+    @apply bg-base-200;
+}
+
+.btn-ghost {
+    @apply bg-base-100;
+}
+
+.btn-ghost:hover {
+    @apply bg-base-200;
+}
+
+.btn:hover {
+    @apply border-4 border-black;
+}
+
+.card {
+    @apply drop-shadow-neo-card rounded-sm border-4 border-black;
+}
+
+.card-title {
+    @apply font-metropolis-bold;
+}
+
+.dropdown-content {
+    @apply drop-shadow-neo border-4 border-black rounded-sm;
+}
+
+ul.dropdown-content li {
+    @apply font-metropolis-light rounded-sm;
+}
+
+@layer base {
+    @font-face {
+        font-family: 'Metropolis';
+        src: local('Metropolis'), url('/fonts/Metropolis-Regular.woff') format('woff'),
+            url('/fonts/Metropolis-Regular.woff2') format('woff');
+    }
+    @font-face {
+        font-family: 'Metropolis-Italic';
+        src: local('Metropolis-Italic'), url('/fonts/Metropolis-RegularItalic.woff') format('woff'),
+            url('/fonts/Metropolis-RegularItalic.woff2') format('woff');
+    }
+    @font-face {
+        font-family: 'Metropolis-Bold';
+        src: local('Metropolis-Bold'), url('/fonts/Metropolis-Bold.woff') format('woff'),
+            url('/fonts/Metropolis-Bold.woff2') format('woff');
+    }
+    @font-face {
+        font-family: 'Metropolis-Bold-Italic';
+        src: local('Metropolis-Bold-Italic'), url('/fonts/Metropolis-BoldItalic.woff') format('woff'),
+            url('/fonts/Metropolis-BoldItalic.woff2') format('woff');
+    }
+    @font-face {
+        font-family: 'Metropolis-Light';
+        src: local('Metropolis-Light'), url('/fonts/Metropolis-Light.woff') format('woff'),
+            url('/fonts/Metropolis-Light.woff2') format('woff');
+    }
+    @font-face {
+        font-family: 'Metropolis-Light-Italic';
+        src: local('Metropolis-Light-Italic'), url('/fonts/Metropolis-LightItalic.woff') format('woff'),
+            url('/fonts/Metropolis-LightItalic.woff2') format('woff');
+    }
+
+    html {
+        font-family: Metropolis, system-ui, sans-serif;
+    }
+}

@@ -1,9 +1,9 @@
 v: 0
 micros:
-  - name: backend
+  - name: backend-v1
     src: ./backend
     engine: python3.9
-    path: api
+    path: api/v1
     public_routes:
       - "/openapi.json"
   - name: frontend

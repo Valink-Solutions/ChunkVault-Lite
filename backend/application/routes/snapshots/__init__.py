@@ -51,3 +51,15 @@ async def get_snapshots(last: str = None, limit: int = 100):
     results = snapshot_db.fetch(limit=limit, last=last)
     
     return results
+
+@router.get("/{snapshot_id}")
+async def get_snapshot(snapshot_id: str, download: bool = False):
+    snapshot_data = snapshot_db.get(snapshot_id)
+    
+    if not snapshot_data:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Snapshot {snapshot_id} does not exist.")
+    
+    if not download:
+        return JSONResponse(content=snapshot_data)
+    
+    return snapshot_drive.get(snapshot_data["name"])
