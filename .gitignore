@@ -1,0 +1,6 @@
+**/**/__pycache__
+/backend/.venv
+/.space
+.space
+**/**/.env
+test_script.py

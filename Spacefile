@@ -1,0 +1,12 @@
+v: 0
+micros:
+  - name: backend
+    src: ./backend
+    engine: python3.9
+    path: api
+    public_routes:
+      - "/openapi.json"
+  - name: frontend
+    src: ./frontend
+    engine: svelte-kit
+    primary: true
