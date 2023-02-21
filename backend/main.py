@@ -1,17 +1,26 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from application import __version__
 from application.routes import router
 
 def startup() -> FastAPI:
-    app = FastAPI(
-        tittle="ChunkVault - Deta Backend",
+    app_base = FastAPI(
+        title="ChunkVault-Lite - Deta Space Backend",
         version=__version__,
     )
+        
+    app_base.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-    app.include_router(router)
+    app_base.include_router(router)
 
-    return app
+    return app_base
 
 app = startup()
 

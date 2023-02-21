@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 .badge {
-    @apply rounded-sm font-metropolis;
+    @apply rounded-sm font-metropolis-semibold drop-shadow-neo border-4 border-black p-2;
 }
 
 .btn {
@@ -73,6 +73,16 @@ ul.dropdown-content li {
             url('/fonts/Metropolis-BoldItalic.woff2') format('woff');
     }
     @font-face {
+        font-family: 'Metropolis-SemiBold';
+        src: local('Metropolis-SemiBold'), url('/fonts/Metropolis-SemiBold.woff') format('woff'),
+            url('/fonts/Metropolis-SemiBold.woff2') format('woff');
+    }
+    @font-face {
+        font-family: 'Metropolis-SemiBold-Italic';
+        src: local('Metropolis-SemiBold-Italic'), url('/fonts/Metropolis-SemiBoldItalic.woff') format('woff'),
+            url('/fonts/Metropolis-SemiBoldItalic.woff2') format('woff');
+    }
+    @font-face {
         font-family: 'Metropolis-Light';
         src: local('Metropolis-Light'), url('/fonts/Metropolis-Light.woff') format('woff'),
             url('/fonts/Metropolis-Light.woff2') format('woff');
@@ -84,6 +94,6 @@ ul.dropdown-content li {
     }
 
     html {
-        font-family: Metropolis, system-ui, sans-serif;
+        font-family: "Metropolis", system-ui, sans-serif;
     }
 }

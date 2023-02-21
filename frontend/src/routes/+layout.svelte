@@ -7,7 +7,10 @@
 
 	<div class="navbar bg-base-100 container mx-auto justify-center">
 		<div class="navbar-center">
-			<a href="/" class="font-metropolis-bold-italic text-2xl">ChunkVault</a>
+			<dif class="flex flex-row gap-1">
+				<a href="/" class="font-metropolis-bold-italic text-2xl">ChunkVault</a>
+				<div class="font-metropolis-semibold-italic badge badge-primary badge-sm">Lite</div>
+			</dif>
 		</div>
 		<!-- <div class="navbar-end">
 		  <div class="dropdown dropdown-end">

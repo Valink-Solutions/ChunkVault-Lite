@@ -5,12 +5,17 @@ from fastapi import APIRouter, UploadFile, File, Header, HTTPException, status
 from fastapi.responses import JSONResponse
 from nanoid import generate
 
-from application.utils.databases import snapshot_db, snapshot_drive, upload_session_db
+from application.utils.databases import snapshot_db, snapshot_drive, upload_session_db, worlds_db
 
 router = APIRouter()
 
 @router.post("/")
-async def upload_snapshot(file: UploadFile, file_name: str, session_id: str = None, content_length: int = 0):
+async def upload_snapshot(file: UploadFile, world_id: str, file_name: str, session_id: str = None, content_length: int = 0):
+    
+    world = worlds_db.get(world_id)
+    
+    if not world:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"World: {world_id} does not exist.")
     
     if not session_id:
         session =  upload_session_db.put({"name": file_name, "size": 0, "total_size": content_length})
@@ -34,9 +39,11 @@ async def upload_snapshot(file: UploadFile, file_name: str, session_id: str = No
     if session_size == session["total_size"]:
         
         with open(f"./tmp/{session_id}.part", "rb") as f:
-            snapshot_drive.put(session["name"], f)
+            snapshot_drive.put(f"{world_id}/{session['name']}", f)
             
-            snapshot_db.put({"name": session["name"], "size": content_length, "created_at": time.time()})
+            snapshot_db.put({"world_id": world_id, "name": f"{world_id}/{session['name']}", "size": content_length, "created_at": time.time()})
+            
+            worlds_db.update({"num_snapshots": world["num_snapshots"]+1}, world["key"])
             
         upload_session_db.delete(session_id)
         
@@ -57,7 +64,7 @@ async def get_snapshot(snapshot_id: str, download: bool = False):
     snapshot_data = snapshot_db.get(snapshot_id)
     
     if not snapshot_data:
-        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Snapshot {snapshot_id} does not exist.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Snapshot {snapshot_id} does not exist.")
     
     if not download:
         return JSONResponse(content=snapshot_data)

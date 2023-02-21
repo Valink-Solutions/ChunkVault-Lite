@@ -10,6 +10,8 @@ log_db = deta.Base("logs")
 
 upload_session_db = deta.Base("upload_sessions")
 
+worlds_db = deta.Base("worlds")
+
 snapshot_db = deta.Base("snaphsots")
 
 snapshot_drive = deta.Drive("snapshots")
