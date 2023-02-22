@@ -28,6 +28,11 @@ async def create_new_world(data: NewWorldSchema = Body(...)):
 
     new_world = WorldSchema(**data.dict())
     
+    results = worlds_db.fetch({"name": new_world.name})
+    
+    if results.count > 0:
+        return HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED, detail=f"World: {new_world.name} already exists.")
+    
     result = worlds_db.put(new_world.dict())
     
     if not result:
@@ -68,3 +73,16 @@ async def get_world(world_id: str):
         **world,
         "snapshots": results.items
     })
+    
+    
+@router.get("/find/{world_name}")
+async def find_world(world_name: str):
+    
+    results = worlds_db.fetch({"name": world_name})
+    
+    if not results.count > 0:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"World: {world_name} does not exist.")
+    
+    world = results.items[0]
+    
+    return world

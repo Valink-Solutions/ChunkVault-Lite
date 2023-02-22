@@ -1,4 +1,6 @@
 v: 0
+icon: ./icon.png
+app_name: "ChunkVault-Lite"
 micros:
   - name: backend-v1
     src: ./backend
