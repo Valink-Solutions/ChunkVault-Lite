@@ -1,24 +1,24 @@
 export interface World {
-    key: String,
-    name: String,
-    image: String,
-    num_snapshots: Number,
-    size: Number
+    key: string,
+    name: string,
+    image: string,
+    num_snapshots: number,
+    size: number
 }
 
 export interface WorldWithSnaps {
-    key: String,
-    name: String,
-    image: String,
-    num_snapshots: Number,
-    size: Number
+    key: string,
+    name: string,
+    image: string,
+    num_snapshots: number,
+    size: number
     snapshots: Array<Snapshot>
 }
 
 export interface Snapshot {
-    key: String,
-    world_id: String,
-    name: String,
-    size: Number
-    created_at: Number
+    key: string,
+    world_id: string,
+    name: string,
+    size: number
+    created_at: number
 }

@@ -6,6 +6,8 @@ const config = {
             fontFamily: {
                 metropolis: ['Metropolis'],
                 "metropolis-italic": ['Metropolis-Italic'],
+                "metropolis-black": ['Metropolis-Black'],
+                "metropolis-black-italic": ['Metropolis-Black-Italic'],
                 "metropolis-bold": ['Metropolis-Bold'],
                 "metropolis-bold-italic": ['Metropolis-Bold-Italic'],
                 "metropolis-semibold": ['Metropolis-SemiBold'],
