@@ -7,7 +7,9 @@ micros:
     engine: python3.9
     path: api-v1
     public_routes:
-      - "/openapi.json"
+      - "/public/*"
+    presets:
+      api_keys: true
   - name: frontend
     src: ./frontend
     engine: svelte-kit

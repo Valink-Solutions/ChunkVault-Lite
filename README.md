@@ -1,3 +1,5 @@
+![ChunkVault-Lite Logo](/extras/images/chunkvailt-lite-logo.png)
+
 # ChunkVault-Lite
 
 ChunkVault-Lite is an all in one world backup system meant to work with the teller client, allowing users to upload, download and share minecraft world backups.
