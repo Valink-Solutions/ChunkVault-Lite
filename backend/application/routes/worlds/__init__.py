@@ -58,7 +58,7 @@ async def update_world(world_id: str, data: UpdateWorldSchema = Body(...)):
         print(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"World: {world_id} could not be updated.")
     
-    raise HTTPException
+    return JSONResponse(status_code=200, content=f"World: {world_id} was updated.")
     
 @router.get("/{world_id}")
 async def get_world(world_id: str):

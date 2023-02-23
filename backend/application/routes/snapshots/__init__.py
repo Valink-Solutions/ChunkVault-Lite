@@ -1,61 +1,107 @@
-import os
+import os, io
 import time
 from typing import Union
 from fastapi import APIRouter, UploadFile, File, Header, HTTPException, status
 from fastapi.responses import JSONResponse
 from nanoid import generate
 
-from application.utils.databases import snapshot_db, snapshot_drive, upload_session_db, worlds_db
+from application.utils.databases import snapshot_db, snapshot_drive, upload_session_db, worlds_db, temp_drive
 
 router = APIRouter()
 
-@router.post("/")
-async def upload_snapshot(file: UploadFile, world_id: str = Header(...), file_name: str = Header(...), session_id: Union[str, None] = Header(default=None), content_range: str = Header(...)):    
+@router.post("/upload")
+async def initiat_snapshot_session(file_name: str, world_id: str):
+    
     world = worlds_db.get(world_id)
     
     if not world:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"World: {world_id} does not exist.")
     
+    session = upload_session_db.put({"name": file_name, "world_id": world_id, "last_chunk": 0}, expire_in=600)
+    
+    if not session:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    
+    session_id = session["key"]
+    
+    return JSONResponse(content={
+        "session_id": session_id
+    })
+
+@router.post("/upload/{session_id}")
+async def upload_snapshot(file: UploadFile, session_id: str, file_name: str, content_range: str = Header(...)):
     
     start_current, total = content_range.split()[1].split("/")
     start, current = start_current.split("-")
     start, current, total = int(start), int(current), int(total)
     
-    if not session_id:
-        session =  upload_session_db.put({"name": file_name, "size": 0, "total_size": total, "range": start_current}, expire_in=600)
-        session_id = session["key"]
-    else:
-        session = upload_session_db.get(session_id)
-        if session is None:
-            return JSONResponse({"error": "Session not found"}, status_code=404)
-        if session["name"] != file_name:
-            return JSONResponse({"error": "Filename does not match session"}, status_code=400)
-        if current <= session["size"]:
-            return JSONResponse({"error": "Chunk already written"}, status_code=status.HTTP_208_ALREADY_REPORTED)
-
-    # start, current, total = 0, content_length - 1, content_length
+    session = upload_session_db.get(session_id)
+    
+    if session is None:
+        return JSONResponse({"error": "Session not found"}, status_code=404)
+    if session["name"] != file_name:
+        return JSONResponse({"error": "Filename does not match session"}, status_code=400)
+    if current <= session["last_chunk"]:
+        return JSONResponse({"error": "Chunk already written"}, status_code=status.HTTP_208_ALREADY_REPORTED)
+        
+    new_temp_file = io.BytesIO()
     
     chunk = await file.read()
     
-    with open(f"./tmp/{session_id}.part", "ab") as f:
-        f.write(chunk)
-        
-    session_size = session["size"] + (len(chunk) - 1)
+    files = temp_drive.list(prefix=f"{session_id}")
     
-    upload_session_db.update({"size": session_size, "range": start_current}, session_id)
+    temp_file_exists = files["names"] if files["names"] == f"{session_id}.part" else None
+    
+    if not temp_file_exists:
+        
+        new_temp_file.write(chunk)
+        
+        new_temp_file.seek(0)
+        try:
+            temp_drive.put(f"{session_id}.part", new_temp_file)
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        temp_file = temp_drive.get(f"{session_id}.part")
+        
+        for part in temp_file.iter_chunks():
+            new_temp_file.write(part)
+            
+        temp_file.close()
+            
+        new_temp_file.write(chunk)
+        
+        new_temp_file.seek(0)
+        
+        temp_drive.put(f"{session_id}.part", new_temp_file)
+    
+    upload_session_db.update({"last_chunk": current}, session_id)
     
     if current >= total:
         
-        with open(f"./tmp/{session_id}.part", "rb") as f:
-            snapshot_drive.put(f"{world_id}/{session['name']}", f)
-            
-            snapshot_db.put({"world_id": world_id, "name": f"{world_id}/{session['name']}", "size": total, "created_at": time.time()})
-            
-            worlds_db.update({"num_snapshots": world["num_snapshots"]+1}, world["key"])
+        world = worlds_db.get(session["world_id"])
+        
+        if not world:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"World: {session['world_id']} does not exist.")
+        
+        world_id = world['key']
+        
+        current_time = int(time.time())
+        
+        session_file = temp_drive.get(f"{session_id}.part")
+        
+        snapshot_drive.put(f"{world_id}/{current_time}-snapshot.{session['name'].split('.')[1]}", session_file.read())
+        
+        session_file.close()
+        
+        snapshot_db.put({"world_id": world_id, "name": f"{world_id}/{current_time}-snapshot.{session['name'].split('.')[1]}", "size": total, "created_at": time.time()})
+        
+        worlds_db.update({"num_snapshots": world["num_snapshots"]+1}, world["key"])
             
         upload_session_db.delete(session_id)
         
-        os.remove(f"./tmp/{session_id}.part")
+        temp_drive.delete(f"{session_id}.part")
         
         return JSONResponse({"session_id": session_id, "finished": True})
         

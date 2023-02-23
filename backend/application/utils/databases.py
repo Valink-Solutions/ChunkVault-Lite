@@ -15,3 +15,5 @@ worlds_db = deta.Base("worlds")
 snapshot_db = deta.Base("snaphsots")
 
 snapshot_drive = deta.Drive("snapshots")
+
+temp_drive = deta.Drive("temp_files")

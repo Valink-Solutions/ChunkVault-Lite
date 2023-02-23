@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
-import { env } from '$env/dynamic/public';
-import type { World } from '../utils/schemas';
+// import { env } from '$env/dynamic/public';
+import type { World } from '../../utils/schemas';
 
 export const load = (async ({ fetch }) => {
 

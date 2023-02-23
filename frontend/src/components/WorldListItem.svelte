@@ -18,7 +18,7 @@
 </script>
 
 <div class="card card-side w-full bg-base-100">
-    <figure><img class="h-full min-w-[164px]" src="/icon.png" alt="Movie"/></figure>
+    <figure><img class="h-full min-w-[164px]" src={world.image} alt="Movie"/></figure>
     <div class="card-body justify-center">
         <div class="flex flex-row justify-between items-center">
             <h1 class="card-title">{world.name}</h1>
