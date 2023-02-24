@@ -1,35 +1,28 @@
 <script lang="ts">
+	import { formatBytes } from "../utils/reusables";
 	import type { World } from "../utils/schemas";
-
     export let world: World;
-
-    function formatBytes(bytes: number) {
-
-        if (bytes < 1024) {
-            return bytes + " bytes";
-        } else if (bytes < 1048576) {
-            return (bytes / 1024).toFixed(2) + " KB";
-        } else if (bytes < 1073741824) {
-            return (bytes / 1048576).toFixed(2) + " MB";
-        } else {
-            return (bytes / 1073741824).toFixed(2) + " GB";
-        }
-    }
 </script>
 
 <div class="card card-side w-full bg-base-100">
-    <figure><img class="h-full min-w-[164px]" src={world.image} alt="Movie"/></figure>
+    <div class="flex md:items-start md:pt-7 pl-6">
+        <figure class="drop-shadow-neo"><img class="border-4 border-black h-[82px] w-[82px]" src={world.image} alt={world.name}/></figure>
+    </div>
     <div class="card-body justify-center">
         <div class="flex flex-row justify-between items-center">
             <h1 class="card-title">{world.name}</h1>
-            <span class="badge badge-sm badge-ghost">Public</span>
+            {#if (world.is_public)}
+                <span class="badge badge-sm badge-accent">Public</span>
+            {:else}
+                <span class="badge badge-sm badge-ghost">Private</span>
+            {/if}
         </div>
         <h2 class="card-subtitle">World Size: {formatBytes(world.size)}</h2>
         <p>Snapshots: {world.num_snapshots}</p>
         <div class="card-actions justify-center md:justify-end">
-            <button class="btn btn-primary btn-sm">Edit</button>
-            <button class="btn btn-secondary btn-sm">Share</button>
-            <button class="btn btn-error btn-sm">Delete</button>
+            <a href={`/worlds/${world.key}`} class="btn btn-primary btn-sm">View</a>
+            <a href="/" class="btn btn-secondary btn-sm btn-disabled">Share</a>
+            <a href="/" class="btn btn-error btn-sm btn-disabled">Delete</a>
         </div>
     </div>
 </div>

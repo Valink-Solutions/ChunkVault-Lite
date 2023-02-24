@@ -17,7 +17,7 @@ async def initiat_snapshot_session(file_name: str, world_id: str):
     if not world:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"World: {world_id} does not exist.")
     
-    session = upload_session_db.put({"name": file_name, "world_id": world_id, "last_chunk": 0}, expire_in=600)
+    session = upload_session_db.put({"name": file_name, "world_id": world_id, "last_chunk": 0}, expire_in=1800)
     
     if not session:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -91,11 +91,13 @@ async def upload_snapshot(file: UploadFile, session_id: str, file_name: str, con
         
         session_file = temp_drive.get(f"{session_id}.part")
         
-        snapshot_drive.put(f"{world_id}/{current_time}-snapshot.{session['name'].split('.')[1]}", session_file.read())
+        snapshot_name = f"{current_time}-snapshot.{session['name'].split('.')[1]}"
+        
+        snapshot_drive.put(f"{world_id}/{snapshot_name}", session_file.read())
         
         session_file.close()
         
-        snapshot_db.put({"world_id": world_id, "name": f"{world_id}/{current_time}-snapshot.{session['name'].split('.')[1]}", "size": total, "created_at": time.time()})
+        snapshot_db.put({"world_id": world_id, "name": f"{snapshot_name}", "size": total, "created_at": time.time()})
         
         worlds_db.update({"num_snapshots": world["num_snapshots"]+1}, world["key"])
             
@@ -112,16 +114,53 @@ async def upload_snapshot(file: UploadFile, session_id: str, file_name: str, con
 async def get_snapshots(last: str = None, limit: int = 100):
     results = snapshot_db.fetch(limit=limit, last=last)
     
-    return results
+    if not results.count > 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    return {
+        "count": results.count,
+        "last": results.last,
+        "items": results.items        
+    }
 
 @router.get("/{snapshot_id}")
 async def get_snapshot(snapshot_id: str, download: bool = False):
     snapshot_data = snapshot_db.get(snapshot_id)
     
     if not snapshot_data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Snapshot {snapshot_id} does not exist.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Snapshot: {snapshot_id} does not exist.")
     
     if not download:
         return JSONResponse(content=snapshot_data)
     
     return snapshot_drive.get(snapshot_data["name"])
+
+@router.delete("/{snapshot_id}")
+async def delete_snapshot(snapshot_id: str):
+    snapshot = snapshot_db.get(snapshot_id)
+    
+    if not snapshot:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Snapshot: {snapshot_id} does not exist.")
+    
+    world = worlds_db.get(snapshot["world_id"])
+    
+    if not world:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"world: {snapshot['world_id']} does not exist.")
+    
+    try:
+        snapshot_drive.delete(snapshot["name"])
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    snapshot_db.delete(snapshot_id)
+    
+    try:
+        worlds_db.update({"num_snapshots": world["num_snapshots"]-1}, world["key"])
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return JSONResponse(status_code=200, content=f"Snapshot: {snapshot_id} deleted successfully.")
+    
+    

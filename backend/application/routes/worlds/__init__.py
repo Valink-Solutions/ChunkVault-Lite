@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, HTTPException, status
 from fastapi.responses import JSONResponse
 
-from application.utils.databases import worlds_db, snapshot_db
+from application.utils.databases import worlds_db, snapshot_db, snapshot_drive
 from application.schemas.worlds import NewWorldSchema, WorldSchema, UpdateWorldSchema
 from application.utils import remove_none_values
 
@@ -86,3 +86,30 @@ async def find_world(world_name: str):
     world = results.items[0]
     
     return world
+
+@router.delete("/{world_id}")
+async def delete_world(world_id: str):
+    
+    world = worlds_db.get(world_id)
+    
+    if not world:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"World: {world_id} does not exist.")
+    
+    results = snapshot_db.fetch({"world_id": world_id})
+    
+    if results.count > 0:
+        for snapshot in results.items:
+            try:
+                snapshot_drive.delete(snapshot["name"])
+            except Exception as e:
+                print(e)
+                continue
+            snapshot_db.delete(snapshot["key"])
+    
+    try:
+        worlds_db.delete(world_id)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    return JSONResponse(status_code=200, content=f"World: {world_id} deleted successfully.")
