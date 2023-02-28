@@ -1,12 +1,7 @@
+from application.utils.config import DETA_PROJECT_KEY
 from deta import Deta
 
-from application.utils.config import DETA_PROJECT_KEY
-
-deta = Deta(DETA_PROJECT_KEY)
-
-token_db = deta.Base("tokens")
-
-log_db = deta.Base("logs")
+deta = Deta(project_key=DETA_PROJECT_KEY)
 
 upload_session_db = deta.Base("upload_sessions")
 
@@ -16,4 +11,4 @@ snapshot_db = deta.Base("snaphsots")
 
 snapshot_drive = deta.Drive("snapshots")
 
-temp_drive = deta.Drive("temp_files")
+shard_drive = deta.Drive("shards")

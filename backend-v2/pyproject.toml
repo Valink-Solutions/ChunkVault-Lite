@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "application"
+version = "0.1.0"
+description = ""
+authors = ["JakePIXL <jakewjevans@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.92.0"
+deta = "^1.1.0"
+python-multipart = "^0.0.6"
+nanoid = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+python-dotenv = "^1.0.0"
+uvicorn = "^0.20.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

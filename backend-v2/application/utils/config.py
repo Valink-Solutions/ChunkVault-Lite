@@ -7,4 +7,4 @@ try:
 except ImportError:
     pass
 
-DETA_PROJECT_KEY = os.getenv("DETA_PROJECT_KEY")
+DETA_PROJECT_KEY = os.getenv("DETA_PROJECT_KEY", "")

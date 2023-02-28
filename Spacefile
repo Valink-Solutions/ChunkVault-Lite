@@ -10,7 +10,17 @@ micros:
       - "/public/*"
     presets:
       api_keys: true
+  - name: backend-v2
+    src: ./backend-v2
+    engine: python3.9
+    path: api-v2
+    public_routes:
+      - "/public/*"
+    presets:
+      api_keys: true
   - name: frontend
     src: ./frontend
     engine: svelte-kit
     primary: true
+    public_routes:
+      - "/public/* "

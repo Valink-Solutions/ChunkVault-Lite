@@ -20,6 +20,6 @@
 	</div>
 
 	<div class="grow-0 flex w-full justify-center items-center p-6">
-		<h1>Created with &hearts; by Valink Solutions </h1>
+		<h1>Created with &hearts; by <a href="https://valink.io" target="_blank" rel="noopener noreferrer">Valink Solutions</a></h1>
 	</div>
 </div>

@@ -5,6 +5,9 @@ export const prerender = false;
 
 export const load = (async ({ fetch }) => {
 
+    const size_res = await fetch(`/api-v1/snapshots/info/`);
+    const snapshots_info = await size_res.json()
+
     const res = await fetch(`/api-v1/snapshots/`);
     const json = await res.json();
 
@@ -12,5 +15,5 @@ export const load = (async ({ fetch }) => {
     const count = json.count;
     const last = json.last;
     
-    return {snapshots, count, last};
+    return {snapshots, snapshots_info, count, last};
 }) satisfies PageLoad;
