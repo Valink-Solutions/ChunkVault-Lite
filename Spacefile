@@ -2,18 +2,10 @@ v: 0
 icon: ./icon.png
 app_name: "ChunkVault-Lite"
 micros:
-  - name: backend-v1
+  - name: backend
     src: ./backend
     engine: python3.9
-    path: api-v1
-    public_routes:
-      - "/public/*"
-    presets:
-      api_keys: true
-  - name: backend-v2
-    src: ./backend-v2
-    engine: python3.9
-    path: api-v2
+    path: api
     public_routes:
       - "/public/*"
     presets:

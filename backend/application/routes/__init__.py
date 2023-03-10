@@ -1,8 +1,18 @@
-from fastapi import APIRouter
+from application.routes import snapshot, world
 
-from application.routes import snapshots, worlds
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
+
 
 router = APIRouter()
 
-router.include_router(snapshots.router, prefix="/snapshots", tags=["snapshots"])
-router.include_router(worlds.router, prefix="/worlds", tags=["worlds"])
+
+@router.get("/health_check")
+async def get_health_status():
+    return JSONResponse(
+        status_code=200, content={"message": "ChunkVault - Lite is online!"}
+    )
+
+
+router.include_router(snapshot.router, prefix="/snapshots", tags=["Snapshot Managment"])
+router.include_router(world.router, prefix="/worlds", tags=["World Managment"])

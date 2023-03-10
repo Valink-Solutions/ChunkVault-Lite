@@ -5,10 +5,10 @@ export const prerender = false;
 
 export const load = (async ({ fetch }) => {
 
-    const size_res = await fetch(`/api-v2/snapshots/info/`);
+    const size_res = await fetch(`/api/snapshots/info/`);
     const snapshots_info = await size_res.json()
 
-    const res = await fetch(`/api-v2/snapshots`);
+    const res = await fetch(`/api/snapshots`);
     const json = await res.json();
 
     const snapshots: Array<Snapshot> = json.items;

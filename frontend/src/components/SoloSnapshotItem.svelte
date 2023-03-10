@@ -14,7 +14,7 @@
         <h1 class="font-metropolis-italic">{snapshot.name}</h1>
     </div>
     <div class="flex flex-row gap-2 items-center">
-        <a href={`/api-v2/snapshots/${snapshot.key}/download_full`} class="btn btn-ghost px-3 items-center gap-1" download>
+        <a href={`/api/snapshots/${snapshot.key}/download_full`} class="btn btn-ghost px-3 items-center gap-1" download>
             <span class="hidden md:block pt-0.5">Download</span>
             <Icon icon='mdi:cloud-download' class="text-lg"/>
         </a>

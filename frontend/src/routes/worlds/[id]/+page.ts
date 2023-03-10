@@ -7,7 +7,7 @@ export const load = (async ({ params, fetch }) => {
 
     const world_id = params.id
 
-    const res = await fetch(`/api-v1/worlds/${world_id}`);
+    const res = await fetch(`/api/worlds/${world_id}`);
     const world: WorldWithSnaps = await res.json();
     
     return {
