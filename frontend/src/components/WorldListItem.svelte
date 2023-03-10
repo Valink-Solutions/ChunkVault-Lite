@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { formatBytes } from "../utils/reusables";
+	import { formatBytes, formatDifficulty } from "../utils/reusables";
 	import type { World } from "../utils/schemas";
     export let world: World;
+
 </script>
 
 <div class="card card-side w-full bg-base-100">
@@ -17,7 +18,7 @@
                 <span class="badge badge-sm badge-ghost">Private</span>
             {/if}
         </div>
-        <h2 class="card-subtitle">World Size: {formatBytes(world.size)}</h2>
+        <h2 class="card-subtitle">Difficulty: {formatDifficulty(world.difficulty)} | World Size: {formatBytes(world.size)}</h2>
         <p>Snapshots: {world.num_snapshots}</p>
         <div class="card-actions justify-center md:justify-end">
             <a href={`/worlds/${world.key}`} class="btn btn-primary btn-sm">View</a>

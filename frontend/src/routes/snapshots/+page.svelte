@@ -19,8 +19,8 @@ import type { PageData } from '../../routes/$types';
             </ul>
         </div>
         <div class="flex flex-row gap-2">
-            <span><span class="font-metropolis-semibold">Total Snapshots:</span> {data.snapshots_info.count}</span>
-            <span><span class="font-metropolis-semibold">Total Size:</span> {formatBytes(data.snapshots_info.total_size)}/<div class="tooltip tooltip-left" data-tip="This is based purely on Deta Space size, not how much actual room you have left"><button class="link">10 GB</button></div></span>
+            <span><span class="font-metropolis-semibold">Total Snapshots:</span> {data.snapshots_info.num_snapshots}</span>
+            <span><span class="font-metropolis-semibold">Total Size:</span> {formatBytes(data.snapshots_info.size)}/<div class="tooltip tooltip-left" data-tip="This is based purely on Deta Space size, not how much actual room you have left"><button class="link">10 GB</button></div></span>
         </div>
     </div>
     <ul class="flex flex-col gap-4 w-full">

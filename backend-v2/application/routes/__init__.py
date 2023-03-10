@@ -14,5 +14,5 @@ async def get_health_status():
     )
 
 
-router.include_router(snapshot.router, prefix="/snapshots")
-router.include_router(world.router, prefix="/worlds")
+router.include_router(snapshot.router, prefix="/snapshots", tags=["Snapshot Managment"])
+router.include_router(world.router, prefix="/worlds", tags=["World Managment"])

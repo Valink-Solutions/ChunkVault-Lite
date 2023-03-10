@@ -38,6 +38,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"daisyui": "^2.50.2"
+		"daisyui": "^2.50.2",
+		"jszip": "^3.10.1"
 	}
 }

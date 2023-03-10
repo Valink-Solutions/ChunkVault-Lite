@@ -1,7 +1,7 @@
 <script lang="ts">
     import WorldSnapshotList from '../../../components/WorldSnapshotList.svelte';
     import type { PageData } from '../../../routes/$types';
-	import { formatBytes } from '../../../utils/reusables';
+	import { formatBytes, formatDifficulty } from '../../../utils/reusables';
 	import type { Snapshot } from '../../../utils/schemas';
     export let data: PageData;
     const world = data.world;
@@ -43,7 +43,7 @@
                     <span class="badge badge-sm badge-ghost">Private</span>
                 {/if}
             </div>
-            <h2 class="card-subtitle">World Size: {formatBytes(world.size)}</h2>
+            <h2 class="card-subtitle">Difficulty: {formatDifficulty(world.difficulty)} | World Size: {formatBytes(world.size)}</h2>
             <p>Snapshots: {world.num_snapshots} | {formatBytes(snapshots_size)} in Total</p>
             <div class="card-actions justify-center md:justify-end">
                 <button class="btn btn-primary btn-sm btn-disabled">Edit</button>

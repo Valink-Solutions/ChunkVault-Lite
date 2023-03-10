@@ -1,89 +1,317 @@
 import time
-from application.utils.connections import upload_session_db, worlds_db, snapshot_db, shard_drive
+from typing import Union
+from application.utils.connections import (
+    upload_session_db,
+    worlds_db,
+    snapshot_db,
+    shard_drive,
+)
 
 from fastapi import UploadFile, File, HTTPException, status
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 
-from nanoid import generate
 
-def generate_session(world_id: str, name: str):
-    
-    try:
-        world = worlds_db.get(world_id)
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+def create_snapshot(world_id: str, size: int):
+    world = worlds_db.get(world_id)
+
     if not world:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    snapshot_id = generate()
-    
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": f"World: {world_id} does not exist."},
+        )
+
     current_time = int(time.time())
-    
+
     try:
-        snapshot_db.put({
-            "world_id": world_id,
-            "name": f"{current_time}-{snapshot_id}",
-            "parts": 0,
-            "size": 0,
-            "created_at": current_time
-        }, snapshot_id)
+        snapshot = snapshot_db.put(
+            {
+                "world_id": world_id,
+                "name": f"{current_time}-snapshot",
+                "parts": 0,
+                "size": size,
+                "created_at": current_time,
+            }
+        )
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+    return snapshot
+
+
+def generate_session(snapshot_id: str, name: str):
+    snapshot = snapshot_db.get(snapshot_id)
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": f"Snapshot: {snapshot_id} does not exist."},
+        )
+
     try:
-        session = upload_session_db.put({
-            "snapshot_id": snapshot_id,
-            "world_id": world_id,
-            "name": name,
-            "current_part": 0,
-            "current_size": 0
-        })
+        session = upload_session_db.put(
+            {
+                "snapshot_id": snapshot_id,
+                "name": name,
+                "current_part": 0,
+            }
+        )
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return session
 
+
 async def upload_chunk(
-    world_id: str,
+    snapshot_id: str,
     session_id: str,
     name: str,
     part: int = 1,
-    file: UploadFile = File(...)):
-    
+    file: UploadFile = File(...),
+):
+    session = upload_session_db.get(session_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session: {session_id} does not exist.",
+        )
+
+    if not session["name"] == name:  # type: ignore
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Session: {name} does not match file name.",
+        )
+
+    if not session["current_part"] < part:  # type: ignore
+        raise HTTPException(
+            status_code=status.HTTP_208_ALREADY_REPORTED,
+            detail=f"Session: {part} already written.",
+        )
+
+    snapshot = snapshot_db.get(snapshot_id)
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Snapshot: {snapshot_id} does not exist.",
+        )
+
+    if not snapshot_id == snapshot["key"]:  # type: ignore
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Snapshot: {snapshot_id} does not match session.",
+        )
+
     try:
-        session = upload_session_db.get(session_id)
+        await file.seek(0)
+
+        shard_drive.put(
+            f"{snapshot['key']}/{snapshot['name']}.part{part}",  # type: ignore
+            await file.read(),
+        )
+
+        upload_session_db.update(
+            {
+                "current_part": session["current_part"] + 1,  # type: ignore
+            },
+            session_id,
+        )  # type: ignore
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error uploading part: {part}",
+        )
+
+    return JSONResponse(content={"message": f"Sucessfully uploaded part: {part}"})
+
+
+def finish_session(session_id: str, name: str):
+    session = upload_session_db.get(session_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session: {session_id} does not exist.",
+        )
+
+    if not session["name"] == name:  # type: ignore
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Session: {name} does not match file name.",
+        )
+
+    snapshot = snapshot_db.get(session["snapshot_id"])  # type: ignore
+
+    snapshot_id = session["snapshot_id"]  # type: ignore
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Snapshot: {snapshot_id} does not exist.",
+        )
+
+    try:
+        snapshot_db.update(
+            {
+                "parts": session["current_part"],  # type: ignore
+            },
+            session["snapshot_id"],  # type: ignore
+        )
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    if not session:
+
+    upload_session_db.delete(session_id)
+
+    world = worlds_db.get(snapshot["world_id"])  # type: ignore
+
+    if not world:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    if not session["world_id"] == world_id: # type: ignore
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    
-    if not session["name"] == name: # type: ignore
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    
-    if not session["part"] < part: # type: ignore
-        raise HTTPException(status_code=status.HTTP_208_ALREADY_REPORTED)
-    
-    snapshot = snapshot_db.get(session["snapshot_id"]) # type: ignore  
-      
+
+    try:
+        worlds_db.update(
+            {"num_snapshots": world["num_snapshots"] + 1},  # type: ignore
+            snapshot["world_id"],  # type: ignore
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return snapshot
+
+
+def abort_session(session_id: str, name: str):
+    session = upload_session_db.get(session_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session: {session_id} does not exist.",
+        )
+
+    if not session["name"] == name:  # type: ignore
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Session: {name} does not match file name.",
+        )
+
+    snapshot = snapshot_db.get(session["snapshot_id"])  # type: ignore
+
     if not snapshot:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
-    file_size = len(await file.read())
-    
-    await file.seek(0)
-    
-    shard_drive.put(f"{snapshot['name']}.part{part}", file.read()) # type: ignore
-    
-    upload_session_db.update({
-        "parts": session["part"] + 1, # type: ignore
-        "size": session["size"] + file_size # type: ignore
-        
-    }, session_id) # type: ignore
-    
+
+    for part in range(session["current_part"]):  # type: ignore
+        try:
+            shard_drive.delete(f"{snapshot['name']}.part{part+1}")  # type: ignore
+        except Exception as e:
+            print(e)
+            continue
+    try:
+        snapshot_db.delete(session["snapshot_id"])  # type: ignore
+    except Exception as e:
+        print(e)
+
+    try:
+        upload_session_db.delete(session_id)
+    except Exception as e:
+        print(e)
+
+    return JSONResponse(
+        content={"message" f"Session: {session_id} deleted successfully."}
+    )
+
+
+def download_snapshot_part(snapshot_id: str, part: int = 1):
+    snapshot = snapshot_db.get(snapshot_id)
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=404,
+            detail={"message": f"Snapshot: {snapshot_id} does not exist."},
+        )
+
+    try:
+        file = shard_drive.get(
+            f"{snapshot_id}/{snapshot['name']}.part{part}"  # type: ignore
+        )
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+
+    if not file:
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+
+    return Response(file.read(), media_type="application/zip")
+
+
+def download_full_snapshot(snapshot_id: str):
+    snapshot = snapshot_db.get(snapshot_id)
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=404,
+            detail={"message": f"Snapshot: {snapshot_id} does not exist."},
+        )
+
+    parts = snapshot["parts"]  # type: ignore
+
+    def get_parts():
+        for part in range(parts):
+            file = shard_drive.get(
+                f"{snapshot_id}/{snapshot['name']}.part{part+1}"  # type: ignore
+            )
+
+            if not file:
+                raise Exception
+
+            yield file.read()
+
+    file_name = f"{snapshot['name']}.zip"  # type: ignore
+
+    return StreamingResponse(
+        get_parts(),
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{file_name}"'},
+    )
+
+
+def grab_snapshot(snapshot_id: str):
+    snapshot = snapshot_db.get(snapshot_id)
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=404,
+            detail={"message": f"Snapshot: {snapshot_id} does not exist."},
+        )
+
+    return snapshot
+
+
+def grab_snapshots(last: Union[str, None] = None, limit: int = 100):
+    results = snapshot_db.fetch(last=last, limit=limit)  # type: ignore
+
+    if not results.count > 0:
+        raise HTTPException(status_code=404, detail={"message": "No snapshots found."})
+
+    return JSONResponse(
+        content={"count": results.count, "last": results.last, "items": results.items}
+    )
+
+
+def snapshot_size_on_disk():
+    results = snapshot_db.fetch()
+
+    final_count = results.count
+    final_items = results.items
+
+    while results.last:
+        results = snapshot_db.fetch(last=results.last)
+        final_items += results.items
+
+    full_size = 0.0
+
+    for snapshot in final_items:
+        full_size += snapshot.get("size")
+
+    return JSONResponse(content={"num_snapshots": final_count, "size": full_size})

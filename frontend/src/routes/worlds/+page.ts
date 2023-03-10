@@ -5,15 +5,20 @@ export const prerender = false;
 
 export const load = (async ({ fetch }) => {
 
-    const size_res = await fetch(`/api-v1/snapshots/info/`);
+    const size_res = await fetch(`/api-v2/snapshots/info/`);
     const snapshots_info = await size_res.json()
 
-    const res = await fetch(`/api-v1/worlds/`);
+    const res = await fetch(`/api-v2/worlds`);
     const json = await res.json();
 
     const worlds: Array<World> = json.items;
     const count = json.count;
     const last = json.last;
     
-    return {worlds, snapshots_info, count, last};
+    return {
+        worlds: worlds,
+        snapshots_info: snapshots_info,
+        count: count,
+        last: last
+    };
 }) satisfies PageLoad;
