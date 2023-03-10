@@ -204,7 +204,9 @@ def abort_session(session_id: str, name: str):
 
     for part in range(session["current_part"]):  # type: ignore
         try:
-            shard_drive.delete(f"{snapshot['name']}.part{part+1}")  # type: ignore
+            shard_drive.delete(
+                f"{snapshot['key']}/{snapshot['name']}.part{part+1}"  # type: ignore
+            )
         except Exception as e:
             print(e)
             continue

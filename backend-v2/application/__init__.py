@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from application.routes import router
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 def get_application() -> FastAPI:
