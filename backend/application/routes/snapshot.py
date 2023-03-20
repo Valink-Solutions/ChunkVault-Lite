@@ -3,6 +3,7 @@ from typing import Union
 from application.crud.snapshot import (
     abort_session,
     create_snapshot,
+    delete_snapshot,
     finish_session,
     generate_session,
     grab_snapshot,
@@ -14,7 +15,7 @@ from application.crud.snapshot import (
 )
 
 from application.schemas.snapshot import NewSnapshotSchema
-from fastapi import APIRouter, Body, File, UploadFile
+from fastapi import APIRouter, Body, File, UploadFile, BackgroundTasks
 
 
 router = APIRouter()
@@ -33,6 +34,11 @@ async def create_new_snapshot(data: NewSnapshotSchema = Body(...)):
 @router.get("/info/")
 async def grab_snapshots_info():
     return snapshot_size_on_disk()
+
+
+@router.delete("/{snapshot_id}")
+async def delete_snapshot_by_id(snapshot_id: str, background_tasks: BackgroundTasks):
+    return await delete_snapshot(snapshot_id, background_tasks)
 
 
 @router.get("/{snapshot_id}")

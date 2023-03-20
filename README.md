@@ -1,13 +1,41 @@
 ![ChunkVault-Lite Logo](/extras/images/chunkvailt-lite-logo.png)
 
+
 # ChunkVault-Lite
 
-ChunkVault-Lite is an all in one world backup system meant to work with the teller client, allowing users to upload, download and share minecraft world backups.
+## Overview
 
-## Design System
+ChunkVault Lite is a personal Minecraft world backup service designed to provide users with a seamless and efficient way to create versioned snapshots of their Minecraft worlds. This ensures secure storage, easy browsing, and the ability to share worlds with friends. The application is hosted on Deta Space, a personal cloud hosting service tailored for small applications. The frontend of ChunkVault Lite is built using SvelteKit and DaisyUI with a custom neubrutalism theme, while the backend leverages FastAPI.
 
-We use DaisyUI with a Neubrutalism styling.
+## Key Features
 
-## Limitations
+Host your own instance on Deta Space
+Create versioned snapshots of Minecraft worlds
+Secure storage and easy browsing
+Share worlds with friends
+Teller-CLI tool for uploading, downloading, and sharing via the command line
 
-only extremely small world files are allowed because of the limitations of detas systems, we use a resumable chunking system to bypass any file size limitations in detas proxy/reverseproxy but we cannot bypass detas micros size limit, and the fact we can only upload or replace files and not write to files in the drives.
+## Technologies Used
+
+- Frontend: SvelteKit, DaisyUI, Neubrutalism design
+- Backend: FastAPI
+- Hosting: Deta Space
+- CLI: Teller-CLI tool for command-line interaction
+
+## Technical Challenges
+
+Due to Deta's resource constraints, such as a 250 MB RAM limit and a 10-second time to live, several technical challenges had to be overcome:
+
+- Broken FastAPI background tasks: Deta's limitations caused FastAPI background tasks to break. To resolve this, files had to be uploaded pre-chunked by the user. This led to the creation of the teller-cli tool to interact with the backend alongside the frontend, enabling command-line-based uploading, downloading, and sharing.
+
+- Chunked download feature: The 250 MB RAM limit necessitated storing files in a chunked format on the backend. To facilitate downloading from the frontend, a chunked download feature was implemented. However, this resulted in slow browser-based downloads.
+
+- Unique world identification: To uniquely identify worlds, they were given IDs in the format `f'{world_seed}-{world_name}'.` This was necessary as there is no proper way to store an ID in a Minecraft world, based on the testing conducted.
+
+## Future Plans
+
+ChunkVault Lite serves as a foundation for the development of a more robust version, known simply as ChunkVault. This version will be built using Rust and will incorporate erasure coding and most object storage best practices. It will also be open source, allowing for community contributions and enhancements.
+
+## Getting Started
+
+For detailed instructions on how to deploy and use ChunkVault Lite, please refer to the documentation available in the repository. Enjoy a seamless experience of creating, storing, and sharing your Minecraft worlds with ChunkVault Lite!

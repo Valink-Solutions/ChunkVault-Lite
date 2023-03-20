@@ -1,9 +1,9 @@
 from typing import Union
 from application.schemas.world import NewWorldSchema, UpdateWorldSchema, WorldSchema
 from application.utils import remove_none_values
-from application.utils.connections import worlds_db
+from application.utils.connections import worlds_db, snapshot_db
 
-from fastapi import HTTPException, status
+from fastapi import BackgroundTasks, HTTPException, status
 from fastapi.responses import JSONResponse
 
 
@@ -36,6 +36,19 @@ def get_world(world_id: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
     return world
+
+
+def get_world_snapshots(world_id: str, last: Union[str, None] = None, limit: int = 100):
+    world = worlds_db.get(world_id)
+
+    if not world:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    results = snapshot_db.fetch(
+        {"world_id": world_id}, last=last, limit=limit  # type: ignore
+    )
+
+    return {"count": results.count, "last": results.last, "items": results.items}
 
 
 def get_worlds(last: Union[str, None] = None, limit: int = 100):
@@ -72,5 +85,5 @@ def update_world(world_id: str, world_data: UpdateWorldSchema):
     return JSONResponse(status_code=200, content=f"World: {world_id} was updated.")
 
 
-def delete_world(world_id: str):
+async def delete_world(world_id: str, background_tasks: BackgroundTasks):
     return world_id

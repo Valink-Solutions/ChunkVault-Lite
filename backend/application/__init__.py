@@ -13,7 +13,7 @@ def get_application() -> FastAPI:
         description="""
 # A DetaSpace Application
 """,
-        root_path="/api-v2",
+        root_path="/api",
     )
 
     app.add_middleware(

@@ -1,21 +1,16 @@
 from typing import Union
 
-# from application.crud.snapshot import (
-#     abort_session,
-#     finish_session,
-#     generate_session,
-#     upload_chunk,
-# )
 from application.crud.world import (
     create_world,
     delete_world,
     get_world,
+    get_world_snapshots,
     get_worlds,
     update_world,
 )
 from application.schemas.world import NewWorldSchema, UpdateWorldSchema
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, BackgroundTasks, Body
 
 
 router = APIRouter()
@@ -38,47 +33,18 @@ async def grab_world_by_id(world_id: str):
     return get_world(world_id=world_id)
 
 
+@router.get("/{world_id}/snapshots")
+async def grab_world_snapshots_by_id(
+    world_id: str, last: Union[str, None] = None, limit: int = 100
+):
+    return get_world_snapshots(world_id=world_id, last=last, limit=limit)
+
+
 @router.patch("/{world_id}")
 async def update_world_by_id(world_id: str, world_data: UpdateWorldSchema = Body(...)):
     return update_world(world_id, world_data)
 
 
 @router.delete("/{world_id}")
-async def delete_world_by_id(world_id: str):
-    return delete_world(world_id)
-
-
-# World Snapshot options
-
-# @router.post("/{world_id}/snapshots/upload", tags=["Snapshot Managment"])
-# async def intiate_session(world_id: str, name: str, size: int):
-#     return generate_session(world_id=world_id, name=name, size=size)
-
-
-# @router.post("/{world_id}/snapshots/upload/{session_id}", tags=["Snapshot Managment"])
-# async def upload_session_chunk(
-#     world_id: str,
-#     session_id: str,
-#     name: str,
-#     part: int = 1,
-#     file: UploadFile = File(...),
-# ):
-#     return await upload_chunk(
-#         world_id=world_id, session_id=session_id, name=name, part=part, file=file
-#     )
-
-
-# @router.patch(
-# "/{world_id}/snapshots/upload/{session_id}",
-# tags=["Snapshot Managment"]
-# )
-# async def end_upload_session(world_id: str, session_id: str, name: str):
-#     return finish_session(world_id=world_id, session_id=session_id, name=name)
-
-
-# @router.delete(
-#     "/{world_id}/snapshots/upload/{session_id}",
-#     tags=["Snapshot Managment"]
-# )
-# async def abort_upload_session(world_id: str, session_id: str, name: str):
-#     return abort_session(world_id=world_id, session_id=session_id, name=name)
+async def delete_world_by_id(world_id: str, background_tasks: BackgroundTasks):
+    return await delete_world(world_id, background_tasks)

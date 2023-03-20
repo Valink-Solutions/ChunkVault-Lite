@@ -7,7 +7,7 @@ from application.utils.connections import (
     shard_drive,
 )
 
-from fastapi import UploadFile, File, HTTPException, status
+from fastapi import BackgroundTasks, UploadFile, File, HTTPException, status
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 
 
@@ -37,6 +37,61 @@ def create_snapshot(world_id: str, size: int):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return snapshot
+
+
+async def delete_parts(part_range, snapshot_id, snapshot_name):
+    for part in part_range:
+        try:
+            shard_drive.delete(
+                f"{snapshot_id}/{snapshot_name}.part{part+1}"  # type: ignore
+            )
+        except Exception:
+            continue
+
+
+async def delete_snapshot(snapshot_id: str, background_tasks: BackgroundTasks):
+    snapshot = snapshot_db.get(snapshot_id)
+
+    if not snapshot:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": f"Snapshot: {snapshot_id} does not exist."},
+        )
+
+    parts = snapshot["parts"]  # type: ignore
+
+    snapshot_name = snapshot["name"]  # type: ignore
+
+    if parts > 50:
+        chunk_size = 10
+        part_chunks = [
+            range(i, i + chunk_size) for i in range(1, parts + 1, chunk_size)
+        ]
+        for chunk in part_chunks:
+            background_tasks.add_task(delete_parts, chunk, snapshot_id, snapshot_name)
+    else:
+        await delete_parts(range(parts), snapshot_id, snapshot_name)
+
+    world_id = snapshot["world_id"]  # type: ignore
+
+    world = worlds_db.get(world_id)
+
+    if not world:
+        raise HTTPException(status_code=500)
+
+    try:
+        snapshot_db.delete(snapshot_id)
+
+        worlds_db.update(
+            {"num_snapshots": world["num_snapshots"] - 1}, world_id  # type: ignore
+        )
+
+    except Exception:
+        raise HTTPException(status_code=500)
+
+    return JSONResponse(
+        content={"message": f"Snapshot: {snapshot_id} successfully delete."}
+    )
 
 
 def generate_session(snapshot_id: str, name: str):
@@ -172,7 +227,10 @@ def finish_session(session_id: str, name: str):
 
     try:
         worlds_db.update(
-            {"num_snapshots": world["num_snapshots"] + 1},  # type: ignore
+            {
+                "num_snapshots": world["num_snapshots"] + 1,  # type: ignore
+                "newest_snapshot": snapshot_id,
+            },
             snapshot["world_id"],  # type: ignore
         )
     except Exception as e:
@@ -188,13 +246,13 @@ def abort_session(session_id: str, name: str):
     if not session:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Session: {session_id} does not exist.",
+            detail={"message": f"Session: {session_id} does not exist."},
         )
 
     if not session["name"] == name:  # type: ignore
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Session: {name} does not match file name.",
+            detail={"message": f"Session: {name} does not match file name."},
         )
 
     snapshot = snapshot_db.get(session["snapshot_id"])  # type: ignore
@@ -221,7 +279,7 @@ def abort_session(session_id: str, name: str):
         print(e)
 
     return JSONResponse(
-        content={"message" f"Session: {session_id} deleted successfully."}
+        content={"message": f"Session: {session_id} deleted successfully."}
     )
 
 
@@ -256,6 +314,11 @@ def download_full_snapshot(snapshot_id: str):
             detail={"message": f"Snapshot: {snapshot_id} does not exist."},
         )
 
+    world = worlds_db.get(snapshot["world_id"])  # type: ignore
+
+    if not world:
+        raise HTTPException(status_code=500)
+
     parts = snapshot["parts"]  # type: ignore
 
     def get_parts():
@@ -269,7 +332,7 @@ def download_full_snapshot(snapshot_id: str):
 
             yield file.read()
 
-    file_name = f"{snapshot['name']}.zip"  # type: ignore
+    file_name = f"{world['name']}.zip"  # type: ignore
 
     return StreamingResponse(
         get_parts(),

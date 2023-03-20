@@ -4,3 +4,4 @@
 .space
 **/**/.env
 test_script.py
+**/**/.ruff_cache
