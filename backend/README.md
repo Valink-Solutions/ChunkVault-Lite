@@ -75,7 +75,7 @@ This is the backend for ChunkVault-Lite. The backend is built using FastAPI, and
 To format your code using Black, run the following command:
 
 ```bash
-black application
+black .
 ```
 
 ## Ruff as a Linter
