@@ -1,9 +1,12 @@
 [tool.poetry]
 name = "application"
-version = "0.3.1"
+version = "0.3.2"
 description = ""
 authors = ["JakePIXL <jakewjevans@gmail.com>"]
 readme = "README.md"
+
+[tool.poetry.scripts]
+start = "main:start"
 
 [tool.poetry.dependencies]
 python = "^3.9"

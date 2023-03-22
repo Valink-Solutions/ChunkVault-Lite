@@ -16,10 +16,10 @@ const config = {
 				'metropolis-light-italic': ['Metropolis-Light-Italic']
 			},
 			dropShadow: {
-				neo: '3px 3px 0 black',
-				'neo-light': '3px 3px 0 #bdd3f6',
-				'neo-pressed': '2px 2px 0 black',
-				'neo-card': '6px 6px 0 black'
+				neu: '3px 3px 0 black',
+				'neu-light': '3px 3px 0 #bdd3f6',
+				'neu-pressed': '2px 2px 0 black',
+				'neu-card': '6px 6px 0 black'
 			},
 			borderWidth: {
 				2.5: '2.5px',

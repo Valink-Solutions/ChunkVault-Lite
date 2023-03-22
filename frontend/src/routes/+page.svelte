@@ -1,8 +1,8 @@
 <svelte:head>
-  <title>ChunkVault - Home</title>
+	<title>ChunkVault - Home</title>
 </svelte:head>
 
-<div class="flex flex-col gap-4 justify-center items-center w-full px-4 md:p-0">
-    <a href="/worlds" class="btn btn-primary w-full">Worlds</a>
-    <a href="/snapshots" class="btn btn-secondary w-full">Snapshots</a>
+<div class="flex w-full flex-col items-center justify-center gap-4 px-4 md:p-0">
+	<a href="/worlds" class="btn-primary btn w-full">Worlds</a>
+	<a href="/snapshots" class="btn-secondary btn w-full">Snapshots</a>
 </div>

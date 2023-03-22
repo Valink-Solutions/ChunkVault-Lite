@@ -24,7 +24,7 @@ export const load = (async ({ fetch }) => {
 	} catch (error) {
 		console.error(error);
 		return {
-			error: "An error occurred while loading the data."
-		}
+			error: 'An error occurred while loading the data.'
+		};
 	}
 }) satisfies PageLoad;

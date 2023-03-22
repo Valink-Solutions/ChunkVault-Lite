@@ -21,10 +21,10 @@ export const load = (async ({ fetch }) => {
 			count: count,
 			last: last
 		};
-	}  catch (error) {
+	} catch (error) {
 		console.error(error);
 		return {
-			error: "An error occurred while loading the data."
-		}
+			error: 'An error occurred while loading the data.'
+		};
 	}
 }) satisfies PageLoad;

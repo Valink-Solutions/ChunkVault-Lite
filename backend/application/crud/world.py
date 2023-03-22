@@ -1,7 +1,7 @@
 from typing import Union
 from application.schemas.world import NewWorldSchema, UpdateWorldSchema, WorldSchema
 from application.utils import remove_none_values
-from application.utils.connections import worlds_db, snapshot_db
+from application.utils.connections import worlds_db, snapshot_db, shard_drive
 
 from fastapi import BackgroundTasks, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -86,4 +86,51 @@ def update_world(world_id: str, world_data: UpdateWorldSchema):
 
 
 async def delete_world(world_id: str, background_tasks: BackgroundTasks):
-    return world_id
+    world = worlds_db.get(world_id)
+
+    if not world:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"World: {world_id} does not exist.",
+        )
+
+    try:
+        worlds_db.delete(world_id)
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail=f"World: {world_id} could not be deleted.",
+        )
+
+    background_tasks.add_task(delete_world_snapshots, world_id, background_tasks)
+
+    return JSONResponse(status_code=200, content=f"World: {world_id} was deleted.")
+
+
+async def delete_world_snapshots(world_id: str, background_tasks: BackgroundTasks):
+    results = snapshot_db.fetch({"world_id": world_id})
+
+    final_snaps = results.items
+
+    while results.last:
+        results = snapshot_db.fetch({"world_id": world_id}, last=results.last)
+
+        final_snaps += results.last
+
+    for result in final_snaps:
+        try:
+            snapshot_db.delete(result["key"])
+        except Exception:
+            pass
+
+        background_tasks.add_task(
+            delete_snapshot_pieces, f'{result["key"]}/{result["name"]}', result["parts"]
+        )
+
+
+async def delete_snapshot_pieces(snapshot_id: str, parts: int):
+    for part in range(parts):
+        try:
+            shard_drive.delete(f"{snapshot_id}.part{part+1}")
+        except Exception:
+            pass

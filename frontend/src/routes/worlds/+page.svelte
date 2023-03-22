@@ -1,49 +1,49 @@
 <script lang="ts">
-  import type { PageData } from '../../routes/$types';
-	import WorldList from "../../components/WorldList.svelte";
+	import type { PageData } from '../../routes/$types';
+	import WorldList from '../../components/WorldList.svelte';
 	import { formatBytes } from '../../utils/reusables';
 	import type { World } from '../../utils/schemas';
-  export let data: PageData;
-  const worlds: Array<World> | undefined = data?.worlds;
-  const snapshots_info = data?.snapshots_info;
+	export let data: PageData;
+	const worlds: Array<World> | undefined = data?.worlds;
+	const snapshots_info = data?.snapshots_info;
 </script>
 
 <svelte:head>
-  <title>ChunkVault - Worlds</title>
+	<title>ChunkVault - Worlds</title>
 </svelte:head>
-    
+
 {#if worlds}
-  <div class="flex flex-col w-full gap-4 p-4 md:p-0">
-      <div class="flex flex-row items-center justify-between w-full">
-        <div class="text-sm breadcrumbs">
-            <ul>
-              <li><a href="/">Home</a></li> 
-              <li>Worlds</li>
-            </ul>
-        </div>
-        <div class="flex flex-row gap-2">
-            <span><span class="font-metropolis-semibold">Total Snapshots:</span> {snapshots_info.num_snapshots}</span>
-            <span>
-              <span class="font-metropolis-semibold">
-                Total Size:
-              </span>
-              {formatBytes(snapshots_info.size)}
-              /
-              <div class="tooltip tooltip-left" data-tip="This is based purely on Deta Space size, not how much actual room you have left">
-                <button class="link">
-                  10 GB
-                </button>
-              </div>
-            </span>
-        </div>
-      </div>
-        <WorldList worlds={worlds}/>
-  </div>
+	<div class="flex w-full flex-col gap-4 p-4 md:p-0">
+		<div class="flex w-full flex-row items-center justify-between">
+			<div class="breadcrumbs text-sm">
+				<ul>
+					<li><a href="/">Home</a></li>
+					<li>Worlds</li>
+				</ul>
+			</div>
+			<div class="flex flex-row gap-2">
+				<span
+					><span class="font-metropolis-semibold">Total Snapshots:</span>
+					{snapshots_info.num_snapshots}</span
+				>
+				<span>
+					<span class="font-metropolis-semibold"> Total Size: </span>
+					{formatBytes(snapshots_info.size)}
+					/
+					<div
+						class="tooltip tooltip-left"
+						data-tip="This is based purely on Deta Space size, not how much actual room you have left"
+					>
+						<button class="link"> 10 GB </button>
+					</div>
+				</span>
+			</div>
+		</div>
+		<WorldList {worlds} />
+	</div>
 {:else}
-  <div>
-    <h1>Error.</h1>
-    <p>Error...</p>
-  </div>
+	<div>
+		<h1>Error.</h1>
+		<p>Error...</p>
+	</div>
 {/if}
-
-

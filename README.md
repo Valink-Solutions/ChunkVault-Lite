@@ -1,6 +1,5 @@
 ![ChunkVault-Lite Logo](/extras/images/chunkvailt-lite-logo.png)
 
-
 # ChunkVault-Lite
 
 ## Overview
@@ -38,4 +37,6 @@ ChunkVault Lite serves as a foundation for the development of a more robust vers
 
 ## Getting Started
 
-For detailed instructions on how to deploy and use ChunkVault Lite, please refer to the documentation available in the repository. Enjoy a seamless experience of creating, storing, and sharing your Minecraft worlds with ChunkVault Lite!
+To begin development on ChunkVault-Lite, you must first link a project from your Deta Space account. While the backend can function locally without any code modifications, the frontend necessitates adjustments to the API calls. Specifically, you need to replace `/api` with `http://localhost:8080` in every fetch call. This ensures that the calls are routed locally, rather than attempting to operate through Deta's proxy or reverse proxy.
+
+For comprehensive information on backend development, please refer to the backend [README](/backend/README.md). Likewise, for guidance on frontend development, consult the frontend [README](/frontend/README.md).

@@ -269,7 +269,7 @@ def abort_session(session_id: str, name: str):
             print(e)
             continue
     try:
-        snapshot_db.delete(session["snapshot_id"])  # type: ignore
+        snapshot_db.delete(snapshot["key"])  # type: ignore
     except Exception as e:
         print(e)
 
