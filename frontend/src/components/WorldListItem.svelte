@@ -38,10 +38,24 @@
 				<span class="badge-ghost badge badge-sm">Private</span>
 			{/if}
 		</div>
-		<h2 class="card-subtitle">
-			Difficulty: {formatDifficulty(world.difficulty)} | World Size: {formatBytes(world.size)}
-		</h2>
-		<p>Snapshots: {world.num_snapshots}</p>
+
+		<div>
+			<div class="flex flex-col md:flex-row">
+				<h2 class="card-subtitle">
+					Difficulty: {formatDifficulty(world.difficulty)}
+				</h2>
+				<div class="hidden md:divider md:divider-horizontal" />
+				<h2 class="card-subtitle">
+					World Size: {formatBytes(world.size)}
+				</h2>
+			</div>
+			<div class="flex w-fit flex-col md:flex-row">
+				<h2 class="card-subtitle">Seed: {world.seed}</h2>
+				<div class="hidden md:divider md:divider-horizontal" />
+				<h2 class="card-subtitle">Snapshots: {world.num_snapshots}</h2>
+			</div>
+		</div>
+
 		<div class="card-actions justify-center md:justify-end">
 			<a href={`/worlds/${world.key}`} class="btn-primary btn-sm btn">View</a>
 			<a href="/" class="btn-disabled btn-secondary btn-sm btn">Share</a>

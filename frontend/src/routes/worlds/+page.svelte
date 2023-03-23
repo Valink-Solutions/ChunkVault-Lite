@@ -3,9 +3,28 @@
 	import WorldList from '../../components/WorldList.svelte';
 	import { formatBytes } from '../../utils/reusables';
 	import type { World } from '../../utils/schemas';
-	export let data: PageData;
-	const worlds: Array<World> | undefined = data?.worlds;
-	const snapshots_info = data?.snapshots_info;
+	import { worldStore } from '../../utils/worldStore';
+	import { infoStore } from '../../utils/snapshotStore';
+	// export let data: PageData;
+	// const worlds: Array<World> | undefined = data?.worlds;
+	// const snapshots_info = data?.snapshots_info;
+
+	// const error = data?.error;
+
+	let worlds: Array<World>;
+
+	let info: {
+		num_snapshots: number;
+		size: number;
+	};
+
+	worldStore.subscribe((value) => {
+		worlds = value.worlds;
+	});
+
+	infoStore.subscribe((value) => {
+		info = value;
+	});
 </script>
 
 <svelte:head>
@@ -24,11 +43,11 @@
 			<div class="flex flex-row gap-2">
 				<span
 					><span class="font-metropolis-semibold">Total Snapshots:</span>
-					{snapshots_info.num_snapshots}</span
+					{info.num_snapshots}</span
 				>
 				<span>
 					<span class="font-metropolis-semibold"> Total Size: </span>
-					{formatBytes(snapshots_info.size)}
+					{formatBytes(info.size)}
 					/
 					<div
 						class="tooltip tooltip-left"
@@ -41,9 +60,9 @@
 		</div>
 		<WorldList {worlds} />
 	</div>
-{:else}
+	<!-- {:else}
 	<div>
 		<h1>Error.</h1>
-		<p>Error...</p>
-	</div>
+		<p>{error}</p>
+	</div> -->
 {/if}

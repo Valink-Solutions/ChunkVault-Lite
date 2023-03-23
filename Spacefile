@@ -6,6 +6,7 @@ micros:
     src: ./backend
     engine: python3.9
     path: api
+    dev: ./.venv/bin/uvicorn main:app --reload --port $PORT
     public_routes:
       - "/public/*"
     presets:

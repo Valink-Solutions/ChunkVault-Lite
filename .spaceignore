@@ -1,0 +1,8 @@
+/backend/.ruff_cache
+/backend/.venv
+/backend/.env
+/backend/poetry.lock
+/backend/pyproject.toml
+/backend/tests
+/backend/README.md
+**/**/__pycache__

@@ -1,15 +1,23 @@
 <script lang="ts">
 	import SoloSnapshotItem from '../../components/SoloSnapshotItem.svelte';
-	import type { PageData } from '../../routes/$types';
 	import { formatBytes } from '../../utils/reusables';
-	export let data: PageData;
-	const snapshots = data?.snapshots;
-	const snapshots_info = data?.snapshots_info;
+	import type { Snapshot } from '../../utils/schemas';
+	import { infoStore, snapshotStore } from '../../utils/snapshotStore';
 
-	if (!snapshots || !snapshots_info) {
-		// Handle the case when data is not available
-		console.warn('Data is not available.');
-	}
+	let snapshots: Array<Snapshot>;
+
+	let info: {
+		num_snapshots: number;
+		size: number;
+	};
+
+	snapshotStore.subscribe((value) => {
+		snapshots = value.snapshots;
+	});
+
+	infoStore.subscribe((value) => {
+		info = value;
+	});
 </script>
 
 <svelte:head>
@@ -27,11 +35,11 @@
 		<div class="flex flex-row gap-2">
 			<span
 				><span class="font-metropolis-semibold">Total Snapshots:</span>
-				{snapshots_info.num_snapshots}</span
+				{info.num_snapshots}</span
 			>
 			<span
 				><span class="font-metropolis-semibold">Total Size:</span>
-				{formatBytes(snapshots_info.size)}/
+				{formatBytes(info.size)}/
 				<div
 					class="tooltip tooltip-left"
 					data-tip="This is based purely on Deta Space size, not how much actual room you have left"

@@ -72,10 +72,24 @@
 						<span class="badge-ghost badge badge-sm">Private</span>
 					{/if}
 				</div>
-				<h2 class="card-subtitle">
-					Difficulty: {formatDifficulty(world.difficulty)} | World Size: {formatBytes(world.size)}
-				</h2>
-				<p>Snapshots: {world.num_snapshots}</p>
+
+				<div>
+					<div class="flex flex-col md:flex-row">
+						<h2 class="card-subtitle">
+							Difficulty: {formatDifficulty(world.difficulty)}
+						</h2>
+						<div class="hidden md:divider md:divider-horizontal" />
+						<h2 class="card-subtitle">
+							World Size: {formatBytes(world.size)}
+						</h2>
+					</div>
+					<div class="flex w-fit flex-col md:flex-row">
+						<p class="w-fit">Seed: {world.seed}</p>
+						<div class="hidden md:divider md:divider-horizontal" />
+						<p class="w-fit">Snapshots: {world.num_snapshots}</p>
+					</div>
+				</div>
+
 				<div class="card-actions justify-center md:justify-end">
 					<button class="btn-disabled btn-primary btn-sm btn">Edit</button>
 					<button class="btn-disabled btn-secondary btn-sm btn">Share</button>
@@ -91,6 +105,6 @@
 {:else}
 	<div>
 		<h1>Error.</h1>
-		<p>ERROR BRO.</p>
+		<p>{error}</p>
 	</div>
 {/if}

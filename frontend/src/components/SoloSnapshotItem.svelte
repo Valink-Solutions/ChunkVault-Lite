@@ -15,7 +15,7 @@
 					method: 'DELETE'
 				});
 
-				goto(`/worlds`, { replaceState: true });
+				goto(`/snapshots`, { replaceState: true });
 
 				closeModal();
 			}
