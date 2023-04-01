@@ -26,7 +26,7 @@
 
 <div class="md:-0 flex w-full flex-col gap-4 px-4">
 	<div class="flex w-full flex-row items-center justify-between">
-		<div class="breadcrumbs text-sm">
+		<div class="breadcrumbs hidden text-sm md:block">
 			<ul>
 				<li><a href="/">Home</a></li>
 				<li>Snapshots</li>

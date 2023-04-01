@@ -5,13 +5,13 @@
 	import { SvelteToast } from '@zerodevx/svelte-toast';
 
 	const options = {
+		reversed: true,
 		theme: {
-			'--toastContainerTop': 'auto',
-			'--toastContainerBottom': '1.2rem',
 			'--toastBackground': '#f3f5f6',
 			'--toastBorder': '4px solid black',
 			'--toastBoxShadow': '3px 3px 0 black',
-			'--toastColor': 'black'
+			'--toastColor': 'black',
+			'--toastBarBackground': '#a855f7'
 		}
 	};
 </script>
@@ -48,6 +48,12 @@
 </div>
 
 <style>
+	:root {
+		--toastContainerTop: auto;
+		--toastContainerRight: 1.2rem;
+		--toastContainerBottom: 1.2rem;
+		--toastContainerLeft: auto;
+	}
 	.backdrop {
 		position: fixed;
 		top: 0;

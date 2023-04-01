@@ -7,7 +7,7 @@
 
 	export let message: String;
 
-	export let onConfirm;
+	export let onConfirm: () => void;
 </script>
 
 {#if isOpen}

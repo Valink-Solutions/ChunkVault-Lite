@@ -1,5 +1,5 @@
 ---
-title: "ChunkVault-Lite: Personal Minecraft Worlds Manager"
+title: "ChunkVault-Lite"
 tagline: "Your own personal Minecraft worlds manager"
 theme_color: "#f26daa"
 git: "https://github.com/Valink-Solutions/ChunkVault-Lite"
@@ -29,3 +29,5 @@ You're welcome to use ChunkVault-Lite, but please be aware that it is not yet st
 Due to the constraints of Deta systems, ChunkVault-Lite currently only supports extremely small world files. We have implemented a resumable chunking system to bypass file size limitations in Deta's proxy/reverse proxy, but the Deta Micro/Drive size limit remains a challenge. Additionally, Deta Drive can only upload or replace files, not write to them directly.
 
 So, go ahead and give ChunkVault-Lite a try, but remember to use it with caution and enjoy the simplicity of sharing and preserving your Minecraft world backups!
+
+**Developer note:** Yes I am currently working on the full version, but may come back and update this project in the rare chance Deta allows for custom drive sizes for apps, or maybe if im feeling a rewrite in rust 😈 

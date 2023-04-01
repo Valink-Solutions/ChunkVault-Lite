@@ -1,21 +1,27 @@
 <script lang="ts">
 	import WorldSnapshotList from '../../../components/WorldSnapshotList.svelte';
-	import type { PageData } from '../../../routes/$types';
-	import { formatBytes, formatDifficulty } from '../../../utils/reusables';
+	import type { PageData } from './$types';
+	import { formatBytes, formatDifficulty, shareWorld } from '../../../utils/reusables';
 	import { openModal, closeModal } from 'svelte-modals';
 	import Modal from '../../../components/Modal.svelte';
 	import { goto } from '$app/navigation';
 	import type { World, Snapshot } from '../../../utils/schemas';
+	import { browser } from '$app/environment';
+	import { toast } from '@zerodevx/svelte-toast';
 
 	export let data: PageData;
 	const world: World | undefined = data?.world;
 	const snapshots: Array<Snapshot> | undefined = data?.snapshots;
+	const error = data?.error;
 
 	let name = '';
+	let is_public = false;
 
 	if (!world || !snapshots) {
 		// Handle the case when data is not available
 		console.warn('Data is not available.');
+	} else {
+		is_public = world.is_public;
 	}
 
 	name = world?.name || '';
@@ -35,6 +41,22 @@
 					closeModal();
 				}
 			});
+		}
+	}
+
+	async function handleShare() {
+		if (world) {
+			let shareUrl = (await shareWorld(world)) || '';
+
+			if (browser) {
+				await navigator.clipboard.writeText(shareUrl);
+			}
+
+			if (!is_public) {
+				is_public = !is_public;
+			}
+
+			toast.push(`Copied url for ${world.name}`);
 		}
 	}
 
@@ -74,25 +96,31 @@
 				</div>
 
 				<div>
-					<div class="flex flex-col md:flex-row">
+					<div class="flex flex-1 flex-col md:flex-row">
 						<h2 class="card-subtitle">
 							Difficulty: {formatDifficulty(world.difficulty)}
 						</h2>
-						<div class="hidden md:divider md:divider-horizontal" />
+						<div
+							class="mx-2 hidden min-h-[1em] w-0.5 self-stretch bg-slate-400 opacity-100 dark:opacity-50 md:inline-block"
+						/>
 						<h2 class="card-subtitle">
 							World Size: {formatBytes(world.size)}
 						</h2>
 					</div>
-					<div class="flex w-fit flex-col md:flex-row">
+					<div class="flex w-fit flex-1 flex-col md:flex-row">
 						<p class="w-fit">Seed: {world.seed}</p>
-						<div class="hidden md:divider md:divider-horizontal" />
+						<div
+							class="mx-2 hidden min-h-[1em] w-0.5 self-stretch bg-slate-400 opacity-100 dark:opacity-50 md:inline-block"
+						/>
 						<p class="w-fit">Snapshots: {world.num_snapshots}</p>
 					</div>
 				</div>
 
 				<div class="card-actions justify-center md:justify-end">
 					<button class="btn-disabled btn-primary btn-sm btn">Edit</button>
-					<button class="btn-disabled btn-secondary btn-sm btn">Share</button>
+					<div class="tooltip" data-tip="This ALWAYS shares the most recent snapshot.">
+						<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
+					</div>
 					<button on:click={handleClick} class=" btn-error btn-sm btn">Delete</button>
 				</div>
 			</div>

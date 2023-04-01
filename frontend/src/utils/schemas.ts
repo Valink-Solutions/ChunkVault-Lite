@@ -31,3 +31,17 @@ export interface Snapshot {
 	size: number;
 	created_at: number;
 }
+
+export interface PublicWorld {
+	key: string;
+	name: string;
+	image: string;
+	difficulty: number;
+	seed: string;
+	full_size: number;
+	is_public: boolean;
+	world_id: string;
+	parts: number;
+	size: number;
+	created_at: number;
+}

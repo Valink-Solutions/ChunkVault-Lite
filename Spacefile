@@ -1,6 +1,6 @@
 v: 0
 icon: ./icon.png
-app_name: "ChunkVault-Lite"
+app_name: "ChunkVault"
 micros:
   - name: backend
     src: ./backend
@@ -17,3 +17,11 @@ micros:
     primary: true
     public_routes:
       - "/public/* "
+      - "/_app/immutable/*"
+      - "/fonts/*"
+      - "/vault-icon.png"
+    presets:
+      env:
+        - name: PUBLIC_SHARE_DOMAIN
+          description: This should be your custom domain for your app (https://example.com)
+          default: ""

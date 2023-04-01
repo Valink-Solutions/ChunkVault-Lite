@@ -1,4 +1,4 @@
-from application.routes import snapshot, world
+from application.routes import snapshot, world, public
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
@@ -16,3 +16,4 @@ async def get_health_status():
 
 router.include_router(snapshot.router, prefix="/snapshots", tags=["Snapshot Managment"])
 router.include_router(world.router, prefix="/worlds", tags=["World Managment"])
+router.include_router(public.router, prefix="/public", tags=["Public Endpoints"])

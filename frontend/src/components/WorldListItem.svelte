@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { formatBytes, formatDifficulty } from '../utils/reusables';
+	import { domainStore, formatBytes, formatDifficulty, shareWorld } from '../utils/reusables';
 	import { openModal, closeModal } from 'svelte-modals';
 	import Modal from './Modal.svelte';
 	import { goto } from '$app/navigation';
 	import type { World } from '../utils/schemas';
+	import { browser } from '$app/environment';
+	import { toast } from '@zerodevx/svelte-toast';
 	export let world: World;
 
 	function handleClick() {
@@ -20,6 +22,20 @@
 				closeModal();
 			}
 		});
+	}
+
+	async function handleShare() {
+		let shareUrl = (await shareWorld(world)) || '';
+
+		if (browser) {
+			await navigator.clipboard.writeText(shareUrl);
+		}
+
+		if (!world.is_public) {
+			world.is_public = !world.is_public;
+		}
+
+		toast.push(`Copied url for ${world.name}`);
 	}
 </script>
 
@@ -44,21 +60,27 @@
 				<h2 class="card-subtitle">
 					Difficulty: {formatDifficulty(world.difficulty)}
 				</h2>
-				<div class="hidden md:divider md:divider-horizontal" />
+				<div
+					class="mx-2 hidden min-h-[1em] w-0.5 self-stretch bg-slate-400 opacity-100 dark:opacity-50 md:inline-block"
+				/>
 				<h2 class="card-subtitle">
 					World Size: {formatBytes(world.size)}
 				</h2>
 			</div>
 			<div class="flex w-fit flex-col md:flex-row">
 				<h2 class="card-subtitle">Seed: {world.seed}</h2>
-				<div class="hidden md:divider md:divider-horizontal" />
+				<div
+					class="mx-2 hidden min-h-[1em] w-0.5 self-stretch bg-slate-400 opacity-100 dark:opacity-50 md:inline-block"
+				/>
 				<h2 class="card-subtitle">Snapshots: {world.num_snapshots}</h2>
 			</div>
 		</div>
 
 		<div class="card-actions justify-center md:justify-end">
 			<a href={`/worlds/${world.key}`} class="btn-primary btn-sm btn">View</a>
-			<a href="/" class="btn-disabled btn-secondary btn-sm btn">Share</a>
+			<div class="tooltip" data-tip="This ALWAYS shares the most recent snapshot.">
+				<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
+			</div>
 			<button on:click={handleClick} class="btn-error btn-sm btn">Delete</button>
 		</div>
 	</div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from '../../routes/$types';
+	import type { PageData } from './$types';
 	import WorldList from '../../components/WorldList.svelte';
 	import { formatBytes } from '../../utils/reusables';
 	import type { World } from '../../utils/schemas';
@@ -34,7 +34,7 @@
 {#if worlds}
 	<div class="flex w-full flex-col gap-4 p-4 md:p-0">
 		<div class="flex w-full flex-row items-center justify-between">
-			<div class="breadcrumbs text-sm">
+			<div class="breadcrumbs hidden text-sm md:block">
 				<ul>
 					<li><a href="/">Home</a></li>
 					<li>Worlds</li>
