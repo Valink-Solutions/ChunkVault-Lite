@@ -19,7 +19,7 @@ Teller-CLI tool for uploading, downloading, and sharing via the command line
 - Frontend: SvelteKit, DaisyUI, Neubrutalism design
 - Backend: FastAPI
 - Hosting: Deta Space
-- CLI: Teller-CLI tool for command-line interaction
+- CLI: [Teller-CLI](https://github.com/Valink-Solutions/Teller-CLI) tool for command-line interaction
 
 ## Technical Challenges
 
