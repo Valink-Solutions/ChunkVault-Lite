@@ -1,6 +1,7 @@
 import type { PageLoad } from './$types';
 // import { env } from '$env/dynamic/public';
 import type { World, Snapshot } from '../../../utils/schemas';
+import { error } from '@sveltejs/kit';
 export const prerender = false;
 
 export const load = (async ({ params, fetch }) => {
@@ -18,10 +19,9 @@ export const load = (async ({ params, fetch }) => {
 			world: world,
 			snapshots: snapshots
 		};
-	} catch (error) {
-		console.error(error);
-		return {
-			error: 'An error occurred while loading the data.'
-		};
+	} catch (e) {
+		console.error(e);
+
+		throw error(500, 'An error occurred while loading the data.');
 	}
 }) satisfies PageLoad;

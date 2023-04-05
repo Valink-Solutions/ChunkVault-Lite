@@ -1,5 +1,5 @@
 import type { PageLoad } from './$types';
-import { infoStore, snapshotStore } from '../../utils/snapshotStore';
+import { error } from '@sveltejs/kit';
 
 // export const prerender = false;
 
@@ -20,19 +20,15 @@ export const load = (async ({ fetch }) => {
 		const last = json.last;
 		const count = json.count;
 
-		snapshotStore.set({
+		return {
 			snapshots,
 			last,
-			count
-		});
-
-		infoStore.set(info);
-
-		return {};
-	} catch (error) {
-		console.error(error);
-		return {
-			error: 'An error occurred while loading the data.'
+			count,
+			info
 		};
+	} catch (e) {
+		console.error(e);
+
+		throw error(500, 'An error occurred while loading the data.');
 	}
 }) satisfies PageLoad;

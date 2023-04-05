@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import type { PublicWorld } from '../../../../utils/schemas';
 import type { PageLoad } from './$types';
 // import { env } from '$env/dynamic/public';
@@ -13,10 +14,9 @@ export const load = (async ({ params, fetch }) => {
 		return {
 			world: world
 		};
-	} catch (error) {
-		console.error(error);
-		return {
-			error: 'An error occurred while loading the data.'
-		};
+	} catch (e) {
+		console.error(e);
+
+		throw error(500, 'An error occurred while loading the data.');
 	}
 }) satisfies PageLoad;

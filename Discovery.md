@@ -6,11 +6,11 @@ git: "https://github.com/Valink-Solutions/ChunkVault-Lite"
 homepage: "https://valink.io"
 ---
 
-ChunkVault-Lite is a streamlined, all-inclusive world backup system specifically designed to work seamlessly with the Teller client. It empowers Minecraft enthusiasts to effortlessly upload, download, and share their world backups with friends or between devices.
+ChunkVault-Lite is a streamlined, all-inclusive world backup system specifically designed to work seamlessly with the [Teller-CLI](https://pypi.org/project/teller-cli/). It empowers Minecraft enthusiasts to effortlessly upload, download, and share their world backups with friends or between devices.
 
 Built with FastAPI as the backend and SvelteKit as the frontend, ChunkVault-Lite embraces a striking neubrutalism design that balances functionality with aesthetics.
 
-**Please note:** ChunkVault-Lite is currently a proof of concept and has not been battle-tested. Use with caution and understand its limitations.
+**Please note:** ChunkVault-Lite is currently a proof of concept and has not been battle-tested. Use with caution and understand its limitations. Upload functionality only works in [Teller-CLI](https://pypi.org/project/teller-cli/).
 
 # Key Features & Use Cases
 

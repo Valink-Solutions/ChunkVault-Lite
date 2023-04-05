@@ -78,9 +78,7 @@
 
 		<div class="card-actions justify-center md:justify-end">
 			<a href={`/worlds/${world.key}`} class="btn-primary btn-sm btn">View</a>
-			<div class="tooltip" data-tip="This ALWAYS shares the most recent snapshot.">
-				<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
-			</div>
+			<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
 			<button on:click={handleClick} class="btn-error btn-sm btn">Delete</button>
 		</div>
 	</div>

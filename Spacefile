@@ -23,5 +23,5 @@ micros:
     presets:
       env:
         - name: PUBLIC_SHARE_DOMAIN
-          description: This should be your custom domain for your app (https://example.com)
+          description: This should be your custom domain for your app (https://example.com) only set if you have a custom domain attached.
           default: ""

@@ -1,23 +1,11 @@
 <script lang="ts">
+	import type { PageData } from './$types';
 	import SoloSnapshotItem from '../../components/SoloSnapshotItem.svelte';
 	import { formatBytes } from '../../utils/reusables';
 	import type { Snapshot } from '../../utils/schemas';
-	import { infoStore, snapshotStore } from '../../utils/snapshotStore';
-
-	let snapshots: Array<Snapshot>;
-
-	let info: {
-		num_snapshots: number;
-		size: number;
-	};
-
-	snapshotStore.subscribe((value) => {
-		snapshots = value.snapshots;
-	});
-
-	infoStore.subscribe((value) => {
-		info = value;
-	});
+	export let data: PageData;
+	let snapshots: Array<Snapshot> = data.snapshots;
+	let info = data.info;
 </script>
 
 <svelte:head>

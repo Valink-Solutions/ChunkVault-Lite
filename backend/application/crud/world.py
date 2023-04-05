@@ -1,7 +1,12 @@
 from typing import Union
 from application.schemas.world import NewWorldSchema, UpdateWorldSchema, WorldSchema
 from application.utils import remove_none_values
-from application.utils.connections import worlds_db, snapshot_db, shard_drive
+from application.utils.connections import (
+    worlds_db,
+    snapshot_db,
+    shard_drive,
+    shared_worlds_db,
+)
 
 from fastapi import BackgroundTasks, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -72,6 +77,14 @@ def update_world(world_id: str, world_data: UpdateWorldSchema):
         )
 
     parsed_data = remove_none_values(world_data.dict())
+
+    if parsed_data.get("is_public") is True:
+        shared_worlds_db.put({"world_id": world["key"]})  # type: ignore
+    else:
+        shared_resp = shared_worlds_db.fetch({"world_id": world["key"]})  # type: ignore
+
+        if shared_resp.count > 0:
+            shared_worlds_db.delete(shared_resp.items[0]["key"])  # type: ignore
 
     try:
         worlds_db.update(parsed_data, world["key"])  # type: ignore
