@@ -42,7 +42,13 @@
 <div class="card card-side w-full bg-base-100">
 	<div class="flex pl-6 md:items-start md:pt-7">
 		<figure class="drop-shadow-neu">
-			<img class="h-[82px] w-[82px] border-4 border-black" src={world.image} alt={world.name} />
+			<img
+				class="h-[82px] w-[82px] border-4 border-black"
+				src={world.image
+					? world.image
+					: 'https://placehold.co/64x64?text=ChunkVault&font=montserrat'}
+				alt={world.name}
+			/>
 		</figure>
 	</div>
 	<div class="card-body justify-center">

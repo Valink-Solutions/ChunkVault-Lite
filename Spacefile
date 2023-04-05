@@ -11,6 +11,12 @@ micros:
       - "/public/*"
     presets:
       api_keys: true
+    actions:
+      - id: "cleanup"
+        name: "Clean Up Snapshots"
+        description: "Cleans up unused world data"
+        trigger: "schedule"
+        default_interval: "0/15 * * * *"
   - name: frontend
     src: ./frontend
     engine: svelte-kit

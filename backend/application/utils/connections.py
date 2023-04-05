@@ -14,3 +14,5 @@ snapshot_drive = deta.Drive("snapshots")
 shard_drive = deta.Drive("shards")
 
 shared_worlds_db = deta.Base("shared_worlds")
+
+deleted_snapshots_db = deta.Base("deleted_snapshots")

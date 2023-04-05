@@ -6,6 +6,7 @@ from application.utils.connections import (
     snapshot_db,
     shard_drive,
     shared_worlds_db,
+    deleted_snapshots_db,
 )
 
 from fastapi import BackgroundTasks, HTTPException, status
@@ -135,6 +136,14 @@ async def delete_world_snapshots(world_id: str, background_tasks: BackgroundTask
             snapshot_db.delete(result["key"])
         except Exception:
             pass
+
+        deleted_snapshots_db.put(
+            {
+                "snapshot_id": result["key"],
+                "name": result["name"],
+                "parts": result["parts"],
+            }
+        )
 
         background_tasks.add_task(
             delete_snapshot_pieces, f'{result["key"]}/{result["name"]}', result["parts"]

@@ -5,9 +5,10 @@ from application.utils.connections import (
     worlds_db,
     snapshot_db,
     shard_drive,
+    deleted_snapshots_db,
 )
 
-from fastapi import BackgroundTasks, UploadFile, File, HTTPException, status
+from fastapi import UploadFile, File, HTTPException, status
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 
 
@@ -49,7 +50,7 @@ async def delete_parts(part_range, snapshot_id, snapshot_name):
             continue
 
 
-async def delete_snapshot(snapshot_id: str, background_tasks: BackgroundTasks):
+async def delete_snapshot(snapshot_id: str):
     snapshot = snapshot_db.get(snapshot_id)
 
     if not snapshot:
@@ -62,15 +63,15 @@ async def delete_snapshot(snapshot_id: str, background_tasks: BackgroundTasks):
 
     snapshot_name = snapshot["name"]  # type: ignore
 
-    if parts > 50:
-        chunk_size = 10
-        part_chunks = [
-            range(i, i + chunk_size) for i in range(1, parts + 1, chunk_size)
-        ]
-        for chunk in part_chunks:
-            background_tasks.add_task(delete_parts, chunk, snapshot_id, snapshot_name)
-    else:
-        await delete_parts(range(parts), snapshot_id, snapshot_name)
+    deleted_snapshots_db.put(
+        {
+            "snapshot_id": snapshot["key"],  # type: ignore
+            "name": snapshot["name"],  # type: ignore
+            "parts": snapshot["parts"],  # type: ignore
+        }
+    )
+
+    await delete_parts(range(parts), snapshot_id, snapshot_name)
 
     world_id = snapshot["world_id"]  # type: ignore
 
@@ -257,17 +258,16 @@ def abort_session(session_id: str, name: str):
 
     snapshot = snapshot_db.get(session["snapshot_id"])  # type: ignore
 
+    deleted_snapshots_db.put(
+        {
+            "snapshot_id": snapshot["key"],  # type: ignore
+            "name": snapshot["name"],  # type: ignore
+            "parts": snapshot["parts"],  # type: ignore
+        }
+    )
+
     if not snapshot:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-    for part in range(session["current_part"]):  # type: ignore
-        try:
-            shard_drive.delete(
-                f"{snapshot['key']}/{snapshot['name']}.part{part+1}"  # type: ignore
-            )
-        except Exception as e:
-            print(e)
-            continue
     try:
         snapshot_db.delete(snapshot["key"])  # type: ignore
     except Exception as e:
@@ -277,6 +277,15 @@ def abort_session(session_id: str, name: str):
         upload_session_db.delete(session_id)
     except Exception as e:
         print(e)
+
+    for part in range(session["current_part"]):  # type: ignore
+        try:
+            shard_drive.delete(
+                f"{snapshot['key']}/{snapshot['name']}.part{part+1}"  # type: ignore
+            )
+        except Exception as e:
+            print(e)
+            continue
 
     return JSONResponse(
         content={"message": f"Session: {session_id} deleted successfully."}

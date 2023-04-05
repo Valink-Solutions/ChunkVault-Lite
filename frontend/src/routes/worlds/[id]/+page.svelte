@@ -82,7 +82,9 @@
 			<figure class="drop-shadow-neu">
 				<img
 					class="h-[82px] w-[82px] border-4 border-black drop-shadow-neu"
-					src={world.image}
+					src={world.image
+						? world.image
+						: 'https://placehold.co/64x64?text=ChunkVault&font=montserrat'}
 					alt={world.name}
 				/>
 			</figure>

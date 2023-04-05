@@ -68,7 +68,7 @@ async def delete_snapshot_by_id(
     background_tasks: BackgroundTasks,
     snapshot_id: str = Path(..., description="The unique identifier of the snapshot."),
 ):
-    return await delete_snapshot(snapshot_id, background_tasks)
+    return await delete_snapshot(snapshot_id)
 
 
 @router.get(
