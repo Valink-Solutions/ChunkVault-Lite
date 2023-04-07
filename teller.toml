@@ -1,0 +1,7 @@
+[API]
+api_url = https://chunkvault-lite.jakepixl.dev/api
+teller_lite_api_token = ****
+
+[DEFAULTS]
+saves_folder = /Volumes/extra ssd/Prism Instances/MainCraft/.minecraft/saves
+

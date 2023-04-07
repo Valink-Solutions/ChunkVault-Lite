@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { domainStore, formatBytes, formatDifficulty, shareWorld } from '../utils/reusables';
+	import { formatBytes, formatDifficulty, shareWorld } from '../utils/reusables';
 	import { openModal, closeModal } from 'svelte-modals';
 	import Modal from './Modal.svelte';
 	import { goto } from '$app/navigation';
@@ -29,10 +29,6 @@
 
 		if (browser) {
 			await navigator.clipboard.writeText(shareUrl);
-		}
-
-		if (!world.is_public) {
-			world.is_public = !world.is_public;
 		}
 
 		toast.push(`Copied url for ${world.name}`);
@@ -84,7 +80,11 @@
 
 		<div class="card-actions justify-center md:justify-end">
 			<a href={`/worlds/${world.key}`} class="btn-primary btn-sm btn">View</a>
-			<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
+			{#if world.is_public}
+				<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
+			{:else}
+				<button class="btn-disabled btn-secondary btn-sm btn">Share</button>
+			{/if}
 			<button on:click={handleClick} class="btn-error btn-sm btn">Delete</button>
 		</div>
 	</div>

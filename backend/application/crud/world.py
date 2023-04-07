@@ -4,8 +4,7 @@ from application.utils import remove_none_values
 from application.utils.connections import (
     worlds_db,
     snapshot_db,
-    shard_drive,
-    shared_worlds_db,
+    snapshot_drive,
     deleted_snapshots_db,
 )
 
@@ -79,14 +78,6 @@ def update_world(world_id: str, world_data: UpdateWorldSchema):
 
     parsed_data = remove_none_values(world_data.dict())
 
-    if parsed_data.get("is_public") is True:
-        shared_worlds_db.put({"world_id": world["key"]})  # type: ignore
-    else:
-        shared_resp = shared_worlds_db.fetch({"world_id": world["key"]})  # type: ignore
-
-        if shared_resp.count > 0:
-            shared_worlds_db.delete(shared_resp.items[0]["key"])  # type: ignore
-
     try:
         worlds_db.update(parsed_data, world["key"])  # type: ignore
     except Exception as e:
@@ -153,6 +144,6 @@ async def delete_world_snapshots(world_id: str, background_tasks: BackgroundTask
 async def delete_snapshot_pieces(snapshot_id: str, parts: int):
     for part in range(parts):
         try:
-            shard_drive.delete(f"{snapshot_id}.part{part+1}")
+            snapshot_drive.delete(f"{snapshot_id}.part{part+1}")
         except Exception:
             pass

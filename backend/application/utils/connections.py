@@ -7,12 +7,8 @@ upload_session_db = deta.Base("upload_sessions")
 
 worlds_db = deta.Base("worlds")
 
-snapshot_db = deta.Base("snaphsots")
+snapshot_db = deta.Base("snapshots")
 
 snapshot_drive = deta.Drive("snapshots")
-
-shard_drive = deta.Drive("shards")
-
-shared_worlds_db = deta.Base("shared_worlds")
 
 deleted_snapshots_db = deta.Base("deleted_snapshots")

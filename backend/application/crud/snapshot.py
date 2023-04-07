@@ -4,7 +4,7 @@ from application.utils.connections import (
     upload_session_db,
     worlds_db,
     snapshot_db,
-    shard_drive,
+    snapshot_drive,
     deleted_snapshots_db,
 )
 
@@ -43,7 +43,7 @@ def create_snapshot(world_id: str, size: int):
 async def delete_parts(part_range, snapshot_id, snapshot_name):
     for part in part_range:
         try:
-            shard_drive.delete(
+            snapshot_drive.delete(
                 f"{snapshot_id}/{snapshot_name}.part{part+1}"  # type: ignore
             )
         except Exception:
@@ -162,7 +162,7 @@ async def upload_chunk(
     try:
         await file.seek(0)
 
-        shard_drive.put(
+        snapshot_drive.put(
             f"{snapshot['key']}/{snapshot['name']}.part{part}",  # type: ignore
             await file.read(),
         )
@@ -280,7 +280,7 @@ def abort_session(session_id: str, name: str):
 
     for part in range(session["current_part"]):  # type: ignore
         try:
-            shard_drive.delete(
+            snapshot_drive.delete(
                 f"{snapshot['key']}/{snapshot['name']}.part{part+1}"  # type: ignore
             )
         except Exception as e:
@@ -302,7 +302,7 @@ def download_snapshot_part(snapshot_id: str, part: int = 1):
         )
 
     try:
-        file = shard_drive.get(
+        file = snapshot_drive.get(
             f"{snapshot_id}/{snapshot['name']}.part{part}"  # type: ignore
         )
     except Exception:
@@ -332,7 +332,7 @@ def download_full_snapshot(snapshot_id: str):
 
     def get_parts():
         for part in range(parts):
-            file = shard_drive.get(
+            file = snapshot_drive.get(
                 f"{snapshot_id}/{snapshot['name']}.part{part+1}"  # type: ignore
             )
 

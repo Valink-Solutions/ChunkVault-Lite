@@ -15,7 +15,6 @@
 	const snapshots: Array<Snapshot> = data.snapshots;
 
 	let name = world.name;
-	let is_public = world.is_public;
 
 	function handleDelete() {
 		openModal(Modal, {
@@ -26,7 +25,7 @@
 					method: 'DELETE'
 				});
 
-				goto(`/worlds`, { replaceState: true });
+				goto(`/worlds`, { replaceState: true, invalidateAll: true });
 
 				closeModal();
 			}
@@ -53,10 +52,6 @@
 
 		if (browser) {
 			await navigator.clipboard.writeText(shareUrl);
-		}
-
-		if (!is_public) {
-			is_public = !is_public;
 		}
 
 		toast.push(`Copied url for ${world.name}`);
@@ -122,7 +117,11 @@
 
 			<div class="card-actions justify-center md:justify-end">
 				<button on:click={handleEdit} class="btn-primary btn-sm btn">Edit</button>
-				<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
+				{#if world.is_public}
+					<button on:click={handleShare} class="btn-secondary btn-sm btn">Share</button>
+				{:else}
+					<button class="btn-disabled btn-secondary btn-sm btn">Share</button>
+				{/if}
 				<button on:click={handleDelete} class=" btn-error btn-sm btn">Delete</button>
 			</div>
 		</div>

@@ -1,5 +1,4 @@
 from typing import Union
-from application.crud.public import create_new_shared_world, get_shared_world
 
 from application.crud.world import (
     create_world,
@@ -111,17 +110,3 @@ async def delete_world_by_id(
     world_id: str = Path(..., description="The unique identifier of the world."),
 ):
     return await delete_world(world_id, background_tasks)
-
-
-@router.put("/{world_id}/share")
-async def share_world(
-    world_id: str = Path(..., description="The unique identifier of the world.")
-):
-    return create_new_shared_world(world_id)
-
-
-@router.get("/{world_id}/share")
-async def get_shared_world_by_id(
-    world_id: str = Path(..., description="The unique identifier of the world.")
-):
-    return get_shared_world(world_id)

@@ -29,8 +29,6 @@ Due to Deta's resource constraints, such as a 250 MB RAM limit and a 10-second t
 
 - Chunked download feature: The 250 MB RAM limit necessitated storing files in a chunked format on the backend. To facilitate downloading from the frontend, a chunked download feature was implemented. However, this resulted in slow browser-based downloads.
 
-- Unique world identification: To uniquely identify worlds, they were given IDs in the format `f'{world_seed}-{world_name}'.` This was necessary as there is no proper way to store an ID in a Minecraft world, based on the testing conducted.
-
 ## Future Plans
 
 ChunkVault Lite serves as a foundation for the development of a more robust version, known simply as ChunkVault. This version will be built using Rust and will incorporate erasure coding and most object storage best practices. It will also be open source, allowing for community contributions and enhancements.

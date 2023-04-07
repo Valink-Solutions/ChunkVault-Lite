@@ -22,7 +22,7 @@
 					return;
 				}
 
-				goto(`/worlds`, { replaceState: true });
+				goto(`/worlds`, { replaceState: true, invalidateAll: true });
 
 				closeModal();
 			}

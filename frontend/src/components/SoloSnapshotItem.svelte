@@ -16,7 +16,7 @@
 					method: 'DELETE'
 				});
 
-				goto(`/snapshots`, { replaceState: true });
+				goto(`/snapshots`, { replaceState: true, invalidateAll: true });
 
 				closeModal();
 			}

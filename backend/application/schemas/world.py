@@ -1,5 +1,6 @@
+import time
 from typing import Union
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class NewWorldSchema(BaseModel):
@@ -19,6 +20,7 @@ class WorldSchema(BaseModel):
     is_public: bool
     image: Union[str, None] = None
     num_snapshots: Union[int, None] = 0
+    created: Union[float, None] = Field(default_factory=time.time)
 
 
 class UpdateWorldSchema(BaseModel):

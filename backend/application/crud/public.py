@@ -1,47 +1,23 @@
 from application.utils.connections import (
     worlds_db,
-    shared_worlds_db,
     snapshot_db,
-    shard_drive,
+    snapshot_drive,
 )
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import Response
 
 
-def create_new_shared_world(world_id: str):
+def grab_shared_world(world_id: str):
     world = worlds_db.get(world_id)
 
-    if world["is_public"]:  # type: ignore
-        return JSONResponse(content={"message": "World already shared."})
-
-    worlds_db.update({"is_public": True}, world["key"])  # type: ignore
-
-    shared_worlds_db.put({"world_id": world["key"]})  # type: ignore
-
-    response = shared_worlds_db.fetch({"world_id": world["key"]})  # type: ignore
-
-    if response.count <= 0:
-        raise HTTPException(status_code=500)
-
-    return {"key": response.items[0]["key"]}
-
-
-def grab_shared_world(shared_id: str):
-    shared_world = shared_worlds_db.get(shared_id)
-
-    if not shared_world:
-        raise HTTPException(status_code=404)
-
-    world_key = shared_world["world_id"]  # type: ignore
-
-    world = worlds_db.get(world_key)
-
-    if not world:
-        raise HTTPException(status_code=404)
+    if not world or world["is_public"] is False:  # type: ignore
+        raise HTTPException(
+            status_code=404,
+            detail={"message": f"World: {world_id} does not exist publicly."},
+        )
 
     latest_snap = snapshot_db.get(world["newest_snapshot"])  # type: ignore
 
-    del world["key"]  # type: ignore
     del world["newest_snapshot"]  # type: ignore
     world["full_size"] = world["size"]  # type: ignore
     del world["size"]  # type: ignore
@@ -51,7 +27,6 @@ def grab_shared_world(shared_id: str):
     del latest_snap["world_id"]  # type: ignore
 
     data = {
-        "key": shared_id,
         **world,  # type: ignore
         **latest_snap,  # type: ignore
     }
@@ -59,24 +34,8 @@ def grab_shared_world(shared_id: str):
     return data
 
 
-def get_shared_world(world_id: str):
-    response = shared_worlds_db.fetch({"world_id": world_id})
-
-    if response.count <= 0:
-        raise HTTPException(status_code=404)
-
-    return {"key": response.items[0]["key"]}
-
-
-def download_shared_world(shared_id: str, part: int):
-    shared_world = shared_worlds_db.get(shared_id)
-
-    if not shared_world:
-        raise HTTPException(status_code=404)
-
-    world_key = shared_world["world_id"]  # type: ignore
-
-    world = worlds_db.get(world_key)
+def download_shared_world(world_id: str, part: int):
+    world = worlds_db.get(world_id)
 
     if not world:
         raise HTTPException(status_code=404)
@@ -92,7 +51,7 @@ def download_shared_world(shared_id: str, part: int):
         )
 
     try:
-        file = shard_drive.get(
+        file = snapshot_drive.get(
             f"{snapshot_id}/{snapshot['name']}.part{part}"  # type: ignore
         )
     except Exception:
