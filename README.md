@@ -6,6 +6,8 @@
 
 ChunkVault Lite is a personal Minecraft world backup service designed to provide users with a seamless and efficient way to create versioned snapshots of their Minecraft worlds. This ensures secure storage, easy browsing, and the ability to share worlds with friends. The application is hosted on Deta Space, a personal cloud hosting service tailored for small applications. The frontend of ChunkVault Lite is built using SvelteKit and DaisyUI with a custom neubrutalism theme, while the backend leverages FastAPI.
 
+Checkout the [Technical Write-Up](https://dev.to/valink/crafting-robust-minecraft-backup-tools-a-deep-dive-into-chunkvault-lite-and-teller-cli-16d1) which explains how ChunkVault-Lite works and how to install it.
+
 ## Key Features
 
 Host your own instance on Deta Space

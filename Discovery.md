@@ -10,7 +10,7 @@ ChunkVault-Lite is a streamlined, all-inclusive world backup system specifically
 
 Built with FastAPI as the backend and SvelteKit as the frontend, ChunkVault-Lite embraces a striking neubrutalism design that balances functionality with aesthetics.
 
-**Please note:** ChunkVault-Lite is currently a proof of concept and has not been battle-tested. Use with caution and understand its limitations. Upload functionality only works in [Teller-CLI](https://pypi.org/project/teller-cli/).
+**Please note:** ChunkVault-Lite is currently a proof of concept and has not been battle-tested Checkout the [Technical Write-Up](https://dev.to/valink/crafting-robust-minecraft-backup-tools-a-deep-dive-into-chunkvault-lite-and-teller-cli-16d1). Use with caution and understand its limitations. Upload functionality only works in [Teller-CLI](https://pypi.org/project/teller-cli/).
 
 # Key Features & Use Cases
 
