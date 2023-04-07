@@ -37,6 +37,12 @@ ChunkVault Lite serves as a foundation for the development of a more robust vers
 
 ## Getting Started
 
-To begin development on ChunkVault-Lite, you must first link a project from your Deta Space account. While the backend can function locally without any code modifications, the frontend necessitates adjustments to the API calls. Specifically, you need to replace `/api` with `http://localhost:8080` in every fetch call. This ensures that the calls are routed locally, rather than attempting to operate through Deta's proxy or reverse proxy.
+In the main directory that holds both the frontend and backend code, simply use the space cli to test in development:
+
+```bash
+space dev
+```
+
+This will create a local development server that reloads changes made to the code so you can test with out breaking changes and without pushing straight to production.
 
 For comprehensive information on backend development, please refer to the backend [README](/backend/README.md). Likewise, for guidance on frontend development, consult the frontend [README](/frontend/README.md).
